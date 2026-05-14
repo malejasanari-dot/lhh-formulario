@@ -55,9 +55,10 @@ export const QUESTIONS = [
     id: 'ciudad',
     phaseId: 'personal',
     question: '¿En qué ciudad resides?',
-    type: 'text',
-    placeholder: 'Ej: Bogotá, Madrid...',
+    type: 'select',
+    variant: 'compact',
     required: true,
+    options: [], // Se cargará dinámicamente desde el backend
   },
   {
     id: 'nivel_educativo',
@@ -85,6 +86,7 @@ export const QUESTIONS = [
     question: 'Profesiones',
     description: '¿Cuál es tu área de conocimiento?',
     type: 'multiselect',
+    variant: 'compact',
     required: false,
     options: [
       { label: 'Abogado', value: 'abogado' },
@@ -101,6 +103,7 @@ export const QUESTIONS = [
     question: 'Idiomas',
     description: 'Selecciona los idiomas que dominas.',
     type: 'multiselect',
+    variant: 'compact',
     required: false,
     options: [
       { label: 'Alemán', value: 'aleman' },
@@ -138,6 +141,7 @@ export const QUESTIONS = [
     question: 'Tecnologías',
     description: 'Herramientas que manejas profesionalmente.',
     type: 'multiselect',
+    variant: 'compact',
     required: false,
     options: [
       { label: 'CAM/CAD', value: 'cam_cad' },

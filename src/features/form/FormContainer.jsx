@@ -7,10 +7,37 @@ import QuestionView from './components/QuestionView';
 import { FORM_PHASES, QUESTIONS } from './constants';
 
 const FormContainer = () => {
-  // Total steps = Welcome + Questions
-  const totalSteps = QUESTIONS.length + 1;
+  const [formQuestions, setFormQuestions] = useState(QUESTIONS);
+  const totalSteps = formQuestions.length + 1;
   const { currentStep, nextStep, prevStep, progress } = useFormStep(totalSteps);
   const [direction, setDirection] = useState(0);
+
+  // Cargar datos dinámicos del backend
+  useEffect(() => {
+    const fetchCiudades = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/ciudades');
+        if (!response.ok) throw new Error('Error al cargar ciudades');
+        
+        const data = await response.json();
+        
+        // Mapear los datos del backend al formato esperado por el select (label, value)
+        const cityOptions = data.map(city => ({
+          label: city.label || city,
+          value: city.value || city
+        }));
+
+        // Actualizar la lista de preguntas con las ciudades obtenidas
+        setFormQuestions(prev => prev.map(q => 
+          q.id === 'ciudad' ? { ...q, options: cityOptions } : q
+        ));
+      } catch (error) {
+        console.error('Error fetching cities:', error);
+      }
+    };
+
+    fetchCiudades();
+  }, []);
 
   // Keyboard shortcut listener
   useEffect(() => {
@@ -62,7 +89,7 @@ const FormContainer = () => {
 
   const isWelcome = currentStep === 0;
   const currentQuestionIndex = currentStep - 1;
-  const currentQuestion = !isWelcome ? QUESTIONS[currentQuestionIndex] : null;
+  const currentQuestion = !isWelcome ? formQuestions[currentQuestionIndex] : null;
   const currentPhase = currentQuestion 
     ? FORM_PHASES.find(p => p.id === currentQuestion.phaseId)
     : null;
@@ -71,7 +98,7 @@ const FormContainer = () => {
     <FormLayout 
       progress={progress} 
       currentPhase={currentPhase}
-      totalSteps={QUESTIONS.length}
+      totalSteps={formQuestions.length}
       currentStepIndex={isWelcome ? -1 : currentQuestionIndex}
     >
       <div className="w-full relative">

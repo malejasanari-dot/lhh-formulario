@@ -8,6 +8,8 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
   const [error, setError] = useState(null);
   const [showAllOptions, setShowAllOptions] = useState(false);
   const inputRef = useRef(null);
+  const isCompact = question.variant === 'compact';
+  const maxVisible = isCompact ? 9 : 6;
 
   // Reset value when question changes
   useEffect(() => {
@@ -56,8 +58,8 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
     ? (!question.required || (Array.isArray(value) && value.length > 0))
     : (!question.required || (value && value.toString().trim().length > 0));
 
-  const visibleOptions = showAllOptions ? question.options : question.options?.slice(0, 6);
-  const hasMoreOptions = question.options?.length > 6;
+  const visibleOptions = showAllOptions ? question.options : question.options?.slice(0, maxVisible);
+  const hasMoreOptions = question.options?.length > maxVisible;
 
   return (
     <div className="space-y-12 w-full">
@@ -102,12 +104,12 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
         className="relative group"
       >
         {question.type === 'select' || question.type === 'multiselect' ? (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {question.type === 'multiselect' && Array.isArray(value) && value.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
                 <AnimatePresence>
                   {value.map((v) => {
-                    const opt = question.options.find(o => o.value === v);
+                    const opt = question.options.find(o => (o.value || o) === v);
                     return (
                       <motion.span
                         key={v}
@@ -116,7 +118,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
                         exit={{ scale: 0.8, opacity: 0 }}
                         className="inline-flex items-center gap-1 px-3 py-1 bg-accent-primary text-white rounded-full text-sm font-medium"
                       >
-                        {opt?.label}
+                        {opt?.label || opt}
                         <button onClick={() => toggleOption(v)}>
                           <X className="w-3 h-3" />
                         </button>
@@ -127,12 +129,17 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className={cn(
+              "grid grid-cols-1 md:grid-cols-2 gap-4",
+              isCompact && "lg:grid-cols-3 gap-3"
+            )}>
               <AnimatePresence mode="popLayout">
                 {visibleOptions.map((option, idx) => {
+                  const optionValue = option.value || option;
+                  const optionLabel = option.label || option;
                   const isSelected = question.type === 'multiselect' 
-                    ? (Array.isArray(value) && value.includes(option.value))
-                    : value === option.value;
+                    ? (Array.isArray(value) && value.includes(optionValue))
+                    : value === optionValue;
                   
                   return (
                     <motion.button
@@ -143,30 +150,31 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
                       exit={{ opacity: 0, scale: 0.9 }}
                       onClick={() => {
                         if (question.type === 'multiselect') {
-                          toggleOption(option.value);
+                          toggleOption(optionValue);
                         } else {
-                          setValue(option.value);
+                          setValue(optionValue);
                           setError(null);
                           setTimeout(onNext, 300);
                         }
                       }}
                       className={cn(
-                        "flex items-center justify-between p-6 rounded-2xl border-2 transition-all duration-300 text-left group/btn",
+                        "flex items-center justify-between border-2 transition-all duration-300 text-left group/btn",
+                        isCompact ? "p-4 rounded-xl" : "p-6 rounded-2xl",
                         isSelected 
                           ? "bg-accent-primary border-accent-primary text-white shadow-lg shadow-accent-primary/20 scale-[1.02]" 
                           : "bg-text-primary/5 border-border-primary text-text-secondary hover:bg-text-primary/10 hover:border-text-primary/20"
                       )}
                     >
-                      <div className="flex items-center gap-4">
-                        <span className={cn(
-                          "w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold transition-colors",
-                          isSelected ? "bg-white/20 text-white" : "bg-text-primary/10 text-text-secondary group-hover/btn:bg-text-primary/20"
-                        )}>
-                          {String.fromCharCode(65 + idx)}
-                        </span>
-                        <span className="text-lg font-medium">{option.label}</span>
+                      <div className={cn("flex items-center", isCompact ? "gap-3" : "gap-4")}>
+                        <span className={cn("font-medium", isCompact ? "text-base" : "text-lg")}>{optionLabel}</span>
                       </div>
-                      {isSelected ? <Check className="w-5 h-5" /> : (question.type === 'multiselect' && <Plus className="w-4 h-4 opacity-0 group-hover/btn:opacity-100 transition-opacity" />)}
+                      {isSelected ? (
+                        <Check className={cn("transition-transform", isCompact ? "w-4 h-4" : "w-5 h-5")} />
+                      ) : (
+                        question.type === 'multiselect' && (
+                          <Plus className="w-4 h-4 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                        )
+                      )}
                     </motion.button>
                   );
                 })}

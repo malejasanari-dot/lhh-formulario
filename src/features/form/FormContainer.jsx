@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import FormLayout from '../../components/layout/FormLayout';
 import { useFormStep } from '../../hooks/useFormStep';
+import { useCatalogs } from '../../hooks/useCatalogs';
 import WelcomeScreen from './components/WelcomeScreen';
 import QuestionView from './components/QuestionView';
 import { FORM_PHASES, QUESTIONS } from './constants';
@@ -9,46 +10,69 @@ import { FORM_PHASES, QUESTIONS } from './constants';
 const FormContainer = () => {
   const [formQuestions, setFormQuestions] = useState(QUESTIONS);
   const totalSteps = formQuestions.length + 1;
+
   const { currentStep, nextStep, prevStep, progress } = useFormStep(totalSteps);
+
   const [direction, setDirection] = useState(0);
 
-  // Cargar datos dinámicos del backend
+  // Hook para gestionar catálogos dinámicos
+  const {
+    catalogs,
+    loading,
+    errors,
+    fetchEducationLevels,
+    fetchCiudades,
+    fetchEstadosCiviles,
+    fetchProfesiones,
+    fetchIdiomas,
+    fetchTecnologias
+  } = useCatalogs();
+
+  // Cargar catálogos dinámicos
   useEffect(() => {
-    const fetchCiudades = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/ciudades');
-        if (!response.ok) throw new Error('Error al cargar ciudades');
-        
-        const data = await response.json();
-        
-        // Mapear los datos del backend al formato esperado por el select (label, value)
-        const cityOptions = data.map(city => ({
-          label: city.label || city,
-          value: city.value || city
-        }));
-
-        // Actualizar la lista de preguntas con las ciudades obtenidas
-        setFormQuestions(prev => prev.map(q => 
-          q.id === 'ciudad' ? { ...q, options: cityOptions } : q
-        ));
-      } catch (error) {
-        console.error('Error fetching cities:', error);
-      }
-    };
-
     fetchCiudades();
+    fetchEducationLevels();
+    fetchEstadosCiviles();
+    fetchProfesiones();
+    fetchIdiomas();
+    fetchTecnologias();
   }, []);
+
+  // Sincronizar opciones dinámicas con preguntas
+  useEffect(() => {
+    setFormQuestions(prev =>
+      prev.map(q => {
+        if (q.isDynamic) {
+          const catalogKey =
+            q.id === 'idioma_nativo'
+              ? 'idiomas'
+              : q.id;
+          if (catalogs[catalogKey]) {
+            return {
+              ...q,
+              options: catalogs[catalogKey]
+            };
+          }
+        }
+
+        return q;
+      })
+    );
+  }, [catalogs]);
 
   // Keyboard shortcut listener
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Enter' && currentStep < totalSteps - 1) {
-        // Special case: Welcome screen button already handled, 
-        // but we can trigger nextStep if not in an input or if handled by input
+        // Enter manejado por QuestionView
       }
     };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [currentStep, totalSteps]);
 
   const variants = {
@@ -57,19 +81,23 @@ const FormContainer = () => {
       opacity: 0,
       filter: 'blur(10px)',
     }),
+
     animate: {
       y: 0,
       opacity: 1,
       filter: 'blur(0px)',
+
       transition: {
         duration: 0.8,
         ease: [0.16, 1, 0.3, 1],
       },
     },
+
     exit: (direction) => ({
       y: direction > 0 ? -40 : 40,
       opacity: 0,
       filter: 'blur(10px)',
+
       transition: {
         duration: 0.6,
         ease: [0.16, 1, 0.3, 1],
@@ -88,15 +116,20 @@ const FormContainer = () => {
   };
 
   const isWelcome = currentStep === 0;
+
   const currentQuestionIndex = currentStep - 1;
-  const currentQuestion = !isWelcome ? formQuestions[currentQuestionIndex] : null;
-  const currentPhase = currentQuestion 
+
+  const currentQuestion = !isWelcome
+    ? formQuestions[currentQuestionIndex]
+    : null;
+
+  const currentPhase = currentQuestion
     ? FORM_PHASES.find(p => p.id === currentQuestion.phaseId)
     : null;
 
   return (
-    <FormLayout 
-      progress={progress} 
+    <FormLayout
+      progress={progress}
       currentPhase={currentPhase}
       totalSteps={formQuestions.length}
       currentStepIndex={isWelcome ? -1 : currentQuestionIndex}
@@ -115,12 +148,27 @@ const FormContainer = () => {
             {isWelcome ? (
               <WelcomeScreen onStart={handleNext} />
             ) : (
-              <QuestionView 
+              <QuestionView
                 question={currentQuestion}
                 onNext={handleNext}
                 onPrev={handlePrev}
                 isFirst={currentStep === 1}
                 isLast={currentStep === totalSteps - 1}
+                isLoading={loading[currentQuestion?.id]}
+                isError={errors[currentQuestion?.id]}
+                onRetry={() => {
+                  if (currentQuestion?.id === 'nivel_educativo') {
+                    fetchEducationLevels();
+                  }
+
+                  if (currentQuestion?.id === 'ciudad') {
+                    fetchCiudades();
+                  }
+
+                  if (currentQuestion?.id === 'profesiones') {
+                    fetchProfesiones();
+                  }
+                }}
               />
             )}
           </motion.div>

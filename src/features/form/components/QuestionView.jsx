@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, Check, AlertCircle, Plus, X } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, AlertCircle, Plus, X, RefreshCw, Loader2, Upload, Camera } from 'lucide-react';
 import { cn } from '../../../utils/cn';
+import { DatePicker } from '../../../components/ui/DatePicker';
 
-const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
+const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, isError, onRetry }) => {
   const [value, setValue] = useState(question.type === 'multiselect' ? [] : '');
   const [error, setError] = useState(null);
   const [showAllOptions, setShowAllOptions] = useState(false);
@@ -54,7 +55,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
     setError(null);
   };
 
-  const isValueValid = question.type === 'multiselect' 
+  const isValueValid = question.type === 'multiselect'
     ? (!question.required || (Array.isArray(value) && value.length > 0))
     : (!question.required || (value && value.toString().trim().length > 0));
 
@@ -64,7 +65,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
   return (
     <div className="space-y-12 w-full">
       <div className="space-y-4">
-        <motion.span 
+        <motion.span
           key={`label-${question.id}`}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -73,8 +74,8 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
           {question.required ? <span className="text-red-500">*</span> : null}
           {question.id.replace('_', ' ').toUpperCase()}
         </motion.span>
-        
-        <motion.h2 
+
+        <motion.h2
           key={`title-${question.id}`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -83,9 +84,9 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
         >
           {question.question}
         </motion.h2>
-        
+
         {question.description && (
-          <motion.p 
+          <motion.p
             key={`desc-${question.id}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -97,7 +98,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
         )}
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
@@ -133,52 +134,91 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
               "grid grid-cols-1 md:grid-cols-2 gap-4",
               isCompact && "lg:grid-cols-3 gap-3"
             )}>
-              <AnimatePresence mode="popLayout">
-                {visibleOptions.map((option, idx) => {
-                  const optionValue = option.value || option;
-                  const optionLabel = option.label || option;
-                  const isSelected = question.type === 'multiselect' 
-                    ? (Array.isArray(value) && value.includes(optionValue))
-                    : value === optionValue;
-                  
-                  return (
-                    <motion.button
-                      layout
-                      key={option.value}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      onClick={() => {
-                        if (question.type === 'multiselect') {
-                          toggleOption(optionValue);
-                        } else {
-                          setValue(optionValue);
-                          setError(null);
-                          setTimeout(onNext, 300);
-                        }
-                      }}
-                      className={cn(
-                        "flex items-center justify-between border-2 transition-all duration-300 text-left group/btn",
-                        isCompact ? "p-4 rounded-xl" : "p-6 rounded-2xl",
-                        isSelected 
-                          ? "bg-accent-primary border-accent-primary text-white shadow-lg shadow-accent-primary/20 scale-[1.02]" 
-                          : "bg-text-primary/5 border-border-primary text-text-secondary hover:bg-text-primary/10 hover:border-text-primary/20"
-                      )}
-                    >
-                      <div className={cn("flex items-center", isCompact ? "gap-3" : "gap-4")}>
-                        <span className={cn("font-medium", isCompact ? "text-base" : "text-lg")}>{optionLabel}</span>
-                      </div>
-                      {isSelected ? (
-                        <Check className={cn("transition-transform", isCompact ? "w-4 h-4" : "w-5 h-5")} />
-                      ) : (
-                        question.type === 'multiselect' && (
-                          <Plus className="w-4 h-4 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-                        )
-                      )}
-                    </motion.button>
-                  );
-                })}
-              </AnimatePresence>
+              {isLoading ? (
+                // Skeleton loading state
+                [...Array(6)].map((_, i) => (
+                  <div
+                    key={`skeleton-${i}`}
+                    className={cn(
+                      "animate-pulse bg-text-primary/5 border-2 border-border-primary/50 rounded-2xl",
+                      isCompact ? "h-16" : "h-20"
+                    )}
+                  />
+                ))
+              ) : isError ? (
+                // Error state
+                <div className="col-span-full py-12 flex flex-col items-center justify-center space-y-4 border-2 border-dashed border-red-500/20 rounded-3xl bg-red-500/5">
+                  <div className="p-3 bg-red-500/10 rounded-full text-red-500">
+                    <AlertCircle className="w-8 h-8" />
+                  </div>
+                  <div className="text-center">
+                    <h4 className="text-lg font-bold text-text-primary">Error al cargar opciones</h4>
+                    <p className="text-text-secondary">No pudimos obtener los datos en este momento.</p>
+                  </div>
+                  <button
+                    onClick={onRetry}
+                    className="flex items-center gap-2 px-6 py-2 bg-text-primary text-bg-primary rounded-xl hover:bg-accent-primary hover:text-white transition-all font-bold"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Reintentar
+                  </button>
+                </div>
+              ) : !question.options || question.options.length === 0 ? (
+                // Empty state
+                <div className="col-span-full py-12 flex flex-col items-center justify-center space-y-4 border-2 border-dashed border-border-primary rounded-3xl bg-text-primary/5">
+                  <div className="text-center">
+                    <h4 className="text-lg font-bold text-text-secondary">No hay opciones disponibles</h4>
+                    <p className="text-text-secondary/60">Vuelve a intentarlo más tarde.</p>
+                  </div>
+                </div>
+              ) : (
+                <AnimatePresence mode="popLayout">
+                  {visibleOptions.map((option, idx) => {
+                    const optionValue = option.value || option;
+                    const optionLabel = option.label || option;
+                    const isSelected = question.type === 'multiselect'
+                      ? (Array.isArray(value) && value.includes(optionValue))
+                      : value === optionValue;
+
+                    return (
+                      <motion.button
+                        layout
+                        key={option.value}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        onClick={() => {
+                          if (question.type === 'multiselect') {
+                            toggleOption(optionValue);
+                          } else {
+                            setValue(optionValue);
+                            setError(null);
+                            setTimeout(onNext, 300);
+                          }
+                        }}
+                        className={cn(
+                          "flex items-center justify-between border-2 transition-all duration-300 text-left group/btn",
+                          isCompact ? "p-4 rounded-xl" : "p-6 rounded-2xl",
+                          isSelected
+                            ? "bg-accent-primary border-accent-primary text-white shadow-lg shadow-accent-primary/20 scale-[1.02]"
+                            : "bg-text-primary/5 border-border-primary text-text-secondary hover:bg-text-primary/10 hover:border-text-primary/20"
+                        )}
+                      >
+                        <div className={cn("flex items-center", isCompact ? "gap-3" : "gap-4")}>
+                          <span className={cn("font-medium", isCompact ? "text-base" : "text-lg")}>{optionLabel}</span>
+                        </div>
+                        {isSelected ? (
+                          <Check className={cn("transition-transform", isCompact ? "w-4 h-4" : "w-5 h-5")} />
+                        ) : (
+                          question.type === 'multiselect' && (
+                            <Plus className="w-4 h-4 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                          )
+                        )}
+                      </motion.button>
+                    );
+                  })}
+                </AnimatePresence>
+              )}
             </div>
 
             {hasMoreOptions && !showAllOptions && (
@@ -192,6 +232,73 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
               </motion.button>
             )}
           </div>
+        ) : question.type === 'upload' ? (
+          <div className="space-y-4">
+            <div
+              className={cn(
+                "w-full h-64 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center space-y-4 transition-all duration-500 cursor-pointer group/upload",
+                value ? "border-accent-primary bg-accent-primary/5" : "border-border-primary hover:border-text-primary/20 hover:bg-text-primary/5"
+              )}
+              onClick={() => inputRef.current?.click()}
+            >
+              <input
+                ref={inputRef}
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files?.[0]) {
+                    setValue(e.target.files[0].name);
+                    setError(null);
+                  }
+                }}
+              />
+              <div className={cn(
+                "p-5 rounded-2xl transition-all duration-500",
+                value ? "bg-accent-primary text-white scale-110" : "bg-text-primary/5 text-text-secondary group-hover/upload:scale-110"
+              )}>
+                {value ? <Camera className="w-8 h-8" /> : <Upload className="w-8 h-8" />}
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-bold text-text-primary">
+                  {value ? 'Foto seleccionada' : 'Selecciona una foto'}
+                </p>
+                <p className="text-sm text-text-secondary">
+                  {value ? value : 'o arrastra el archivo aquí'}
+                </p>
+              </div>
+              {value && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setValue('');
+                  }}
+                  className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                >
+                  Eliminar
+                </button>
+              )}
+            </div>
+          </div>
+        ) : question.type === 'date' ? (
+          <>
+            <input
+              type="date"
+              value={value}
+              onChange={(e) => {
+                setValue(e.target.value);
+                if (error) setError(null);
+              }}
+              className={cn(
+                "w-full bg-transparent border-b-2 py-6 text-2xl md:text-4xl text-text-primary focus:outline-none transition-colors duration-500 font-light",
+                error ? "border-red-500" : "border-border-primary focus:border-accent-primary"
+              )}
+            />
+            <div className={cn(
+              "absolute bottom-0 left-0 h-[2px] transition-all duration-700 ease-in-out",
+              error ? "bg-red-500 w-full" : "bg-accent-primary w-0 group-focus-within:w-full"
+            )} />
+          </>
         ) : (
           <>
             <input
@@ -216,10 +323,10 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
             )} />
           </>
         )}
-        
+
         <AnimatePresence>
           {error && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -232,7 +339,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
         </AnimatePresence>
       </motion.div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
@@ -243,8 +350,8 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast }) => {
           disabled={!isValueValid}
           className={cn(
             "flex items-center gap-2 px-10 py-5 font-bold rounded-2xl transition-all duration-300 group shadow-xl active:scale-95",
-            !isValueValid 
-              ? "bg-text-primary/5 text-text-secondary cursor-not-allowed border border-border-primary" 
+            !isValueValid
+              ? "bg-text-primary/5 text-text-secondary cursor-not-allowed border border-border-primary"
               : "bg-text-primary text-bg-primary hover:bg-accent-primary hover:text-white shadow-text-primary/5"
           )}
         >

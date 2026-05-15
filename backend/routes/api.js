@@ -1,12 +1,15 @@
-const { getCiudades } = require('../controllers/ciudadesController')
+const { getCiudades } = require('../controllers/ciudadesController');
+const { getEducationLevels } = require('../controllers/educationLevelsController');
 const express = require('express');
 const router = express.Router();
 const healthController = require('../controllers/healthController');
 const candidatosController = require('../controllers/candidatosController'); // Importar controlador de candidatos
 const db = require('../db/connection'); // Importar el pool de conexión
-
-/**
- * Rutas de la API
+const { getMaritalStatuses } = require('../controllers/maritalStatusesController');
+const { getProfesiones } = require('../controllers/profesionesController');
+const { getIdiomas } = require('../controllers/idiomasController')
+const { getTecnologias } = require('../controllers/tecnologiasController');
+/* Rutas de la API
  * 
  * Aquí definimos los puntos de acceso y los vinculamos a sus controladores.
  */
@@ -15,7 +18,23 @@ const db = require('../db/connection'); // Importar el pool de conexión
 router.get('/health', healthController.getHealth);
 
 // Endpoint de ciudades (Simulado)
-router.get('/ciudades', getCiudades)
+router.get('/ciudades', getCiudades);
+
+// Endpoint de niveles educativos (Base de datos real)
+router.get('/niveles-educativos', getEducationLevels);
+
+// Endpoint de profesiones (Base de datos real)
+router.get('/profesiones', getProfesiones);
+
+// Endpoint de idiomas
+router.get('/idiomas', getIdiomas);
+
+// Endpoint de estados civiles
+router.get('/estados-civiles', getMaritalStatuses);
+
+router.get('/tecnologias', getTecnologias);
+
+
 
 /**
  * Endpoint temporal para probar la conexión real a MySQL

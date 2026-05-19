@@ -67,7 +67,8 @@ export const QUESTIONS = [
     phaseId: 'personal',
     question: '¿Cuál es tu estado civil?',
     type: 'select',
-    required: true,
+    variant: 'dropdown',
+    required: false,
     isDynamic: true,
     options: [],
   },
@@ -112,6 +113,18 @@ export const QUESTIONS = [
     required: true,
     isDynamic: true,
     options: [],
+  },
+  {
+    id: 'disponibilidad_movilidad',
+    phaseId: 'personal',
+    question: '¿Tienes disponibilidad para cambiar de ciudad?',
+    type: 'select',
+    required: true,
+    options: [
+      { label: 'Sí', value: 'si' },
+      { label: 'No', value: 'no' },
+      { label: 'Depende de la oportunidad', value: 'depende' },
+    ],
   },
   {
     id: 'linkedin',
@@ -160,11 +173,12 @@ export const QUESTIONS = [
     id: 'idiomas',
     phaseId: 'academic',
     question: 'Idiomas',
-    description: 'Selecciona los idiomas que dominas.',
+    description: 'Selecciona los idiomas que dominas y su nivel.',
     type: 'multiselect',
     variant: 'compact',
     required: false,
     isDynamic: true,
+    requiresLevel: true,
     options: [], // Se cargará dinámicamente desde el backend
   },
   {

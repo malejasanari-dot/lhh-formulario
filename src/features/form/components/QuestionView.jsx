@@ -6,17 +6,35 @@ import { DatePicker } from '../../../components/ui/DatePicker';
 
 const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, isError, onRetry }) => {
   const [value, setValue] = useState(question.type === 'multiselect' ? [] : '');
+  const [levels, setLevels] = useState({});
   const [error, setError] = useState(null);
   const [showAllOptions, setShowAllOptions] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const inputRef = useRef(null);
+  const dropdownRef = useRef(null);
+  
   const isCompact = question.variant === 'compact';
   const maxVisible = isCompact ? 9 : 6;
+  const isDropdown = question.variant === 'dropdown' || (question.options?.length > 6);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Reset value when question changes
   useEffect(() => {
     setValue(question.type === 'multiselect' ? [] : '');
+    setLevels({});
     setError(null);
     setShowAllOptions(false);
+    setDropdownOpen(false);
   }, [question.id, question.type]);
 
   const handleNext = () => {
@@ -30,7 +48,15 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
         return;
       }
     }
-    onNext(value);
+    
+    let finalValue = value;
+    if (question.requiresLevel && Array.isArray(value) && value.length > 0) {
+      finalValue = value.map(v => ({
+        language: v,
+        level: levels[v] || 'Básico'
+      }));
+    }
+    onNext(finalValue);
   };
 
   const handleKeyDown = (e) => {
@@ -104,13 +130,58 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
         transition={{ delay: 0.3 }}
         className="relative group"
       >
-        {question.type === 'select' || question.type === 'multiselect' ? (
+        {(question.type === 'select' || question.type === 'multiselect') ? (
           <div className="space-y-4">
             {question.type === 'multiselect' && Array.isArray(value) && value.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className={cn("flex flex-wrap mb-6", question.requiresLevel ? "gap-4" : "gap-2")}>
                 <AnimatePresence>
                   {value.map((v) => {
-                    const opt = question.options.find(o => (o.value || o) === v);
+                    const opt = question.options?.find(o => (o.value || o) === v);
+                    
+                    if (question.requiresLevel) {
+                      return (
+                        <motion.div
+                          key={v}
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0.8, opacity: 0 }}
+                          className="flex flex-col gap-3 p-4 bg-text-primary/5 rounded-2xl border-2 border-border-primary min-w-[200px]"
+                        >
+                          <div className="flex items-center justify-between gap-4">
+                            <span className="text-base font-bold text-text-primary">{opt?.label || opt}</span>
+                            <button onClick={() => {
+                              toggleOption(v);
+                              setLevels(prev => {
+                                const newLevels = {...prev};
+                                delete newLevels[v];
+                                return newLevels;
+                              });
+                            }} className="text-text-secondary hover:text-red-500 transition-colors bg-bg-primary p-1 rounded-full shadow-sm">
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-2 bg-bg-primary rounded-xl p-2 border border-border-primary">
+                             <span className="text-[10px] font-bold text-text-secondary uppercase tracking-widest pl-2">Nivel:</span>
+                             <div className="relative flex-1">
+                               <select
+                                 value={levels[v] || 'Básico'}
+                                 onChange={(e) => setLevels(prev => ({ ...prev, [v]: e.target.value }))}
+                                 className="w-full bg-transparent text-sm font-medium text-text-primary focus:outline-none cursor-pointer appearance-none pr-6"
+                               >
+                                  <option value="Básico">Básico</option>
+                                  <option value="Intermedio">Intermedio</option>
+                                  <option value="Alto">Alto</option>
+                                  <option value="Avanzado">Avanzado</option>
+                               </select>
+                               <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary">
+                                 <ChevronRight className="w-4 h-4 rotate-90" />
+                               </div>
+                             </div>
+                          </div>
+                        </motion.div>
+                      );
+                    }
+
                     return (
                       <motion.span
                         key={v}
@@ -130,106 +201,193 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
               </div>
             )}
 
-            <div className={cn(
-              "grid grid-cols-1 md:grid-cols-2 gap-4",
-              isCompact && "lg:grid-cols-3 gap-3"
-            )}>
-              {isLoading ? (
-                // Skeleton loading state
-                [...Array(6)].map((_, i) => (
-                  <div
-                    key={`skeleton-${i}`}
-                    className={cn(
-                      "animate-pulse bg-text-primary/5 border-2 border-border-primary/50 rounded-2xl",
-                      isCompact ? "h-16" : "h-20"
-                    )}
-                  />
-                ))
-              ) : isError ? (
-                // Error state
-                <div className="col-span-full py-12 flex flex-col items-center justify-center space-y-4 border-2 border-dashed border-red-500/20 rounded-3xl bg-red-500/5">
-                  <div className="p-3 bg-red-500/10 rounded-full text-red-500">
-                    <AlertCircle className="w-8 h-8" />
+            {isDropdown ? (
+              <div className="relative w-full md:w-2/3 group" ref={dropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className={cn(
+                    "w-full bg-transparent border-b-2 py-6 flex items-center justify-between text-2xl md:text-4xl text-left focus:outline-none transition-colors duration-500 font-light cursor-pointer",
+                    error ? "border-red-500" : "border-border-primary",
+                    (!value || value.length === 0) ? "text-text-primary/40" : "text-text-primary"
+                  )}
+                >
+                  <span className="truncate pr-4">
+                    {isLoading ? 'Cargando opciones...' : isError ? 'Error al cargar opciones' :
+                     question.type === 'multiselect' 
+                       ? (value.length > 0 ? 'Seleccionar más opciones...' : 'Selecciona una opción...')
+                       : (value ? (question.options?.find(o => (o.value || o) === value)?.label || value) : 'Selecciona una opción...')}
+                  </span>
+                  <div className="pointer-events-none text-text-secondary transition-transform duration-300 group-focus-within:text-accent-primary flex-shrink-0">
+                    <ChevronRight className={cn("w-8 h-8 transition-transform duration-300", dropdownOpen ? "-rotate-90" : "rotate-90")} />
                   </div>
-                  <div className="text-center">
-                    <h4 className="text-lg font-bold text-text-primary">Error al cargar opciones</h4>
-                    <p className="text-text-secondary">No pudimos obtener los datos en este momento.</p>
-                  </div>
-                  <button
-                    onClick={onRetry}
-                    className="flex items-center gap-2 px-6 py-2 bg-text-primary text-bg-primary rounded-xl hover:bg-accent-primary hover:text-white transition-all font-bold"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                    Reintentar
-                  </button>
-                </div>
-              ) : !question.options || question.options.length === 0 ? (
-                // Empty state
-                <div className="col-span-full py-12 flex flex-col items-center justify-center space-y-4 border-2 border-dashed border-border-primary rounded-3xl bg-text-primary/5">
-                  <div className="text-center">
-                    <h4 className="text-lg font-bold text-text-secondary">No hay opciones disponibles</h4>
-                    <p className="text-text-secondary/60">Vuelve a intentarlo más tarde.</p>
-                  </div>
-                </div>
-              ) : (
-                <AnimatePresence mode="popLayout">
-                  {visibleOptions.map((option, idx) => {
-                    const optionValue = option.value || option;
-                    const optionLabel = option.label || option;
-                    const isSelected = question.type === 'multiselect'
-                      ? (Array.isArray(value) && value.includes(optionValue))
-                      : value === optionValue;
+                </button>
+                <div className={cn(
+                  "absolute bottom-0 left-0 h-[2px] transition-all duration-700 ease-in-out",
+                  error ? "bg-red-500 w-full" : "bg-accent-primary w-0 group-focus-within:w-full"
+                )} />
 
-                    return (
-                      <motion.button
-                        layout
-                        key={option.value}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        onClick={() => {
-                          if (question.type === 'multiselect') {
-                            toggleOption(optionValue);
-                          } else {
-                            setValue(optionValue);
-                            setError(null);
-                            setTimeout(onNext, 300);
-                          }
-                        }}
-                        className={cn(
-                          "flex items-center justify-between border-2 transition-all duration-300 text-left group/btn",
-                          isCompact ? "p-4 rounded-xl" : "p-6 rounded-2xl",
-                          isSelected
-                            ? "bg-accent-primary border-accent-primary text-white shadow-lg shadow-accent-primary/20 scale-[1.02]"
-                            : "bg-text-primary/5 border-border-primary text-text-secondary hover:bg-text-primary/10 hover:border-text-primary/20"
-                        )}
-                      >
-                        <div className={cn("flex items-center", isCompact ? "gap-3" : "gap-4")}>
-                          <span className={cn("font-medium", isCompact ? "text-base" : "text-lg")}>{optionLabel}</span>
+                <AnimatePresence>
+                  {dropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute z-50 w-full mt-2 bg-bg-primary border-2 border-border-primary rounded-3xl shadow-2xl shadow-text-primary/10 max-h-[300px] overflow-y-auto overflow-x-hidden"
+                    >
+                      {isLoading ? (
+                        <div className="p-6 text-text-secondary animate-pulse font-medium">Cargando opciones...</div>
+                      ) : isError ? (
+                        <div className="p-6 text-red-500 flex items-center gap-3 font-medium">
+                           <AlertCircle className="w-5 h-5"/> Error al cargar opciones
                         </div>
-                        {isSelected ? (
-                          <Check className={cn("transition-transform", isCompact ? "w-4 h-4" : "w-5 h-5")} />
-                        ) : (
-                          question.type === 'multiselect' && (
-                            <Plus className="w-4 h-4 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-                          )
-                        )}
-                      </motion.button>
-                    );
-                  })}
-                </AnimatePresence>
-              )}
-            </div>
+                      ) : !question.options || question.options.length === 0 ? (
+                        <div className="p-6 text-text-secondary font-medium">No hay opciones disponibles</div>
+                      ) : (
+                        question.options.map((option) => {
+                          const optValue = option.value || option;
+                          const optLabel = option.label || option;
+                          const isSelected = question.type === 'multiselect' 
+                             ? (Array.isArray(value) && value.includes(optValue))
+                             : value === optValue;
 
-            {hasMoreOptions && !showAllOptions && (
-              <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                onClick={() => setShowAllOptions(true)}
-                className="w-full py-4 text-text-secondary hover:text-text-primary font-bold text-sm uppercase tracking-widest border-2 border-dashed border-border-primary rounded-2xl transition-all hover:bg-text-primary/5"
-              >
-                Ver más opciones
-              </motion.button>
+                          return (
+                            <button
+                              key={optValue}
+                              type="button"
+                              onClick={() => {
+                                if (question.type === 'multiselect') {
+                                  toggleOption(optValue);
+                                } else {
+                                  setValue(optValue);
+                                  setError(null);
+                                  setDropdownOpen(false);
+                                  setTimeout(() => onNext(optValue), 300);
+                                }
+                              }}
+                              className={cn(
+                                "w-full text-left px-6 py-4 transition-colors flex items-center justify-between border-b border-border-primary/30 last:border-0",
+                                isSelected ? "bg-accent-primary/10 text-accent-primary font-bold" : "text-text-primary hover:bg-text-primary/5 font-medium"
+                              )}
+                            >
+                              <span className="text-lg truncate pr-4">{optLabel}</span>
+                              {isSelected ? (
+                                <Check className="w-5 h-5 flex-shrink-0" />
+                              ) : (
+                                question.type === 'multiselect' && <Plus className="w-5 h-5 opacity-0 hover:opacity-100 text-text-secondary flex-shrink-0 transition-opacity" />
+                              )}
+                            </button>
+                          );
+                        })
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <>
+                <div className={cn(
+                  "grid grid-cols-1 md:grid-cols-2 gap-4",
+                  isCompact && "lg:grid-cols-3 gap-3"
+                )}>
+                  {isLoading ? (
+                    // Skeleton loading state
+                    [...Array(6)].map((_, i) => (
+                      <div
+                        key={`skeleton-${i}`}
+                        className={cn(
+                          "animate-pulse bg-text-primary/5 border-2 border-border-primary/50 rounded-2xl",
+                          isCompact ? "h-16" : "h-20"
+                        )}
+                      />
+                    ))
+                  ) : isError ? (
+                    // Error state
+                    <div className="col-span-full py-12 flex flex-col items-center justify-center space-y-4 border-2 border-dashed border-red-500/20 rounded-3xl bg-red-500/5">
+                      <div className="p-3 bg-red-500/10 rounded-full text-red-500">
+                        <AlertCircle className="w-8 h-8" />
+                      </div>
+                      <div className="text-center">
+                        <h4 className="text-lg font-bold text-text-primary">Error al cargar opciones</h4>
+                        <p className="text-text-secondary">No pudimos obtener los datos en este momento.</p>
+                      </div>
+                      <button
+                        onClick={onRetry}
+                        className="flex items-center gap-2 px-6 py-2 bg-text-primary text-bg-primary rounded-xl hover:bg-accent-primary hover:text-white transition-all font-bold"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                        Reintentar
+                      </button>
+                    </div>
+                  ) : !question.options || question.options.length === 0 ? (
+                    // Empty state
+                    <div className="col-span-full py-12 flex flex-col items-center justify-center space-y-4 border-2 border-dashed border-border-primary rounded-3xl bg-text-primary/5">
+                      <div className="text-center">
+                        <h4 className="text-lg font-bold text-text-secondary">No hay opciones disponibles</h4>
+                        <p className="text-text-secondary/60">Vuelve a intentarlo más tarde.</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <AnimatePresence mode="popLayout">
+                      {visibleOptions?.map((option, idx) => {
+                        const optionValue = option.value || option;
+                        const optionLabel = option.label || option;
+                        const isSelected = question.type === 'multiselect'
+                          ? (Array.isArray(value) && value.includes(optionValue))
+                          : value === optionValue;
+
+                        return (
+                          <motion.button
+                            layout
+                            key={optionValue}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            onClick={() => {
+                              if (question.type === 'multiselect') {
+                                toggleOption(optionValue);
+                              } else {
+                                setValue(optionValue);
+                                setError(null);
+                                setTimeout(onNext, 300);
+                              }
+                            }}
+                            className={cn(
+                              "flex items-center justify-between border-2 transition-all duration-300 text-left group/btn",
+                              isCompact ? "p-4 rounded-xl" : "p-6 rounded-2xl",
+                              isSelected
+                                ? "bg-accent-primary border-accent-primary text-white shadow-lg shadow-accent-primary/20 scale-[1.02]"
+                                : "bg-text-primary/5 border-border-primary text-text-secondary hover:bg-text-primary/10 hover:border-text-primary/20"
+                            )}
+                          >
+                            <div className={cn("flex items-center", isCompact ? "gap-3" : "gap-4")}>
+                              <span className={cn("font-medium", isCompact ? "text-base" : "text-lg")}>{optionLabel}</span>
+                            </div>
+                            {isSelected ? (
+                              <Check className={cn("transition-transform", isCompact ? "w-4 h-4" : "w-5 h-5")} />
+                            ) : (
+                              question.type === 'multiselect' && (
+                                <Plus className="w-4 h-4 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                              )
+                            )}
+                          </motion.button>
+                        );
+                      })}
+                    </AnimatePresence>
+                  )}
+                </div>
+
+                {hasMoreOptions && !showAllOptions && (
+                  <motion.button
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    onClick={() => setShowAllOptions(true)}
+                    className="w-full py-4 text-text-secondary hover:text-text-primary font-bold text-sm uppercase tracking-widest border-2 border-dashed border-border-primary rounded-2xl transition-all hover:bg-text-primary/5"
+                  >
+                    Ver más opciones
+                  </motion.button>
+                )}
+              </>
             )}
           </div>
         ) : question.type === 'upload' ? (
@@ -299,6 +457,35 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
               error ? "bg-red-500 w-full" : "bg-accent-primary w-0 group-focus-within:w-full"
             )} />
           </>
+        ) : question.type === 'tel' ? (
+          <div className="flex items-end gap-4 w-full md:w-2/3">
+            <div className="flex-shrink-0 flex items-center gap-2 border-b-2 border-border-primary py-6 text-2xl md:text-4xl text-text-primary font-light opacity-90 cursor-default">
+              <span>🇨🇴</span>
+              <span className="text-text-secondary">+57</span>
+            </div>
+            <div className="relative flex-1 group">
+              <input
+                autoFocus
+                ref={inputRef}
+                type="tel"
+                value={value}
+                onChange={(e) => {
+                  setValue(e.target.value);
+                  if (error) setError(null);
+                }}
+                placeholder={question.placeholder || 'Escribe tu respuesta aquí...'}
+                className={cn(
+                  "w-full bg-transparent border-b-2 py-6 text-2xl md:text-4xl text-text-primary placeholder:text-text-primary/10 focus:outline-none transition-colors duration-500 font-light",
+                  error ? "border-red-500" : "border-border-primary focus:border-accent-primary"
+                )}
+                onKeyDown={handleKeyDown}
+              />
+              <div className={cn(
+                "absolute bottom-0 left-0 h-[2px] transition-all duration-700 ease-in-out",
+                error ? "bg-red-500 w-full" : "bg-accent-primary w-0 group-focus-within:w-full"
+              )} />
+            </div>
+          </div>
         ) : (
           <>
             <input

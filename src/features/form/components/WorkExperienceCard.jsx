@@ -45,7 +45,7 @@ export const WorkExperienceCard = ({
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -15 }}
-      className="w-full bg-text-primary/[0.02] border border-border-primary rounded-3xl p-6 md:p-8 shadow-2xl relative backdrop-blur-sm overflow-hidden"
+      className="w-full bg-text-primary/[0.02] border border-border-primary rounded-3xl p-6 md:p-8 shadow-2xl relative backdrop-blur-sm overflow-visible"
     >
       {/* Decorative top gradient border */}
       <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-accent-primary/20 via-accent-primary to-purple-500/20" />

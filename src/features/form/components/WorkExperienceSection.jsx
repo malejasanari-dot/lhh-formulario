@@ -77,7 +77,7 @@ export const WorkExperienceSection = ({
   const handleAddExperience = () => {
     // Validate current active experience before adding a new one
     const activeErrors = validateExperience(activeExperience);
-    
+
     if (Object.keys(activeErrors).length > 0) {
       setErrorsList({
         ...errorsList,
@@ -124,7 +124,7 @@ export const WorkExperienceSection = ({
   const handleExpandExperience = (idx) => {
     // Optional: Validate current active before leaving
     const activeErrors = validateExperience(activeExperience);
-    
+
     // Store current errors but allow switching for smoother UX,
     // only block if it's completely empty.
     if (!activeExperience.empresa && !activeExperience.cargo) {
@@ -155,11 +155,11 @@ export const WorkExperienceSection = ({
 
     if (hasErrors) {
       setErrorsList(newErrorsList);
-      
+
       // Expand the first experience that has errors
       const firstErrorIdx = Object.keys(newErrorsList)[0];
       setActiveIndex(parseInt(firstErrorIdx));
-      
+
       setGlobalError('Por favor completa todos los campos requeridos en tu historia laboral.');
       return;
     }
@@ -169,7 +169,7 @@ export const WorkExperienceSection = ({
   };
 
   return (
-    <div className="space-y-8 w-full max-w-2xl">
+    <div className="space-y-8 w-full max-w-5xl">
       {/* Header */}
       <div className="space-y-4">
         <motion.span

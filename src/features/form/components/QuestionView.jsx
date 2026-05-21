@@ -160,13 +160,13 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                               <X className="w-4 h-4" />
                             </button>
                           </div>
-                          <div className="flex items-center gap-2 bg-bg-primary rounded-xl p-2 border border-border-primary">
+                          <div className="flex items-center gap-2 bg-bg-secondary rounded-xl p-2 border border-border-primary shadow-inner shadow-text-primary/5">
                              <span className="text-[10px] font-bold text-text-secondary uppercase tracking-widest pl-2">Nivel:</span>
                              <div className="relative flex-1">
                                <select
                                  value={levels[v] || 'Básico'}
                                  onChange={(e) => setLevels(prev => ({ ...prev, [v]: e.target.value }))}
-                                 className="w-full bg-transparent text-sm font-medium text-text-primary focus:outline-none cursor-pointer appearance-none pr-6"
+                                 className="theme-select w-full rounded-lg bg-transparent px-2 py-1 text-sm font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 cursor-pointer appearance-none pr-7"
                                >
                                   <option value="Básico">Básico</option>
                                   <option value="Intermedio">Intermedio</option>

@@ -59,3 +59,23 @@ body {
 #root {
   width: 100%;
 }
+
+select.theme-select {
+  color: var(--text-primary);
+  background-color: transparent;
+  color-scheme: dark;
+}
+
+:root.light select.theme-select {
+  color-scheme: light;
+}
+
+select.theme-select option {
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+}
+
+select.theme-select option:checked {
+  color: #ffffff;
+  background-color: var(--accent-primary);
+}

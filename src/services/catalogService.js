@@ -98,6 +98,72 @@ export const catalogService = {
       console.error('Error en catalogService.getTecnologias:', error);
       throw error;
     }
-  }
+},
+
+  // Agregar los otros métodos:
+
+  /**
+   * Obtiene la lista de niveles laborales.
+   */
+  getLevels: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/niveles-laborales`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getLevels:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene la lista de áreas de expertiz.
+   */
+  getInterestingAreas: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/areas-expertiz`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getInterestingAreas:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene la lista de motivos de retiro.
+   */
+  getReasons: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/motivos-retiro`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getReasons:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene la lista de paquetes de desvinculación.
+   */
+  getPackageItems: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/paquetes-desvinculacion`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getPackageItems:', error);
+      throw error;
+    }
+  },
 
 }

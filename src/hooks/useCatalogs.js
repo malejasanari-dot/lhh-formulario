@@ -53,6 +53,11 @@ export const useCatalogs = () => {
     fetchEstadosCiviles: () => loadCatalog('estado_civil', catalogService.getMaritalStatuses),
     fetchProfesiones: () => loadCatalog('profesiones', catalogService.getProfesiones),
     fetchIdiomas: () => loadCatalog('idiomas', catalogService.getIdiomas),
-    fetchTecnologias: () => loadCatalog('tecnologias', catalogService.getTecnologias)
+    fetchTecnologias: () => loadCatalog('tecnologias', catalogService.getTecnologias),
+    fetchLevels: () => loadCatalog('levels', catalogService.getLevels),
+    fetchInterestingAreas: () => loadCatalog('interestingAreas', catalogService.getInterestingAreas),
+    fetchReasons: () => loadCatalog('reasons', catalogService.getReasons),
+    fetchPackageItems: () => loadCatalog('packageItems', catalogService.getPackageItems)
+
   };
 };

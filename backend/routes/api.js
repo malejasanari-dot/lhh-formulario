@@ -9,6 +9,10 @@ const { getMaritalStatuses } = require('../controllers/maritalStatusesController
 const { getProfesiones } = require('../controllers/profesionesController');
 const { getIdiomas } = require('../controllers/idiomasController')
 const { getTecnologias } = require('../controllers/tecnologiasController');
+const { getLevels } = require('../controllers/levelsController');
+const { getInterestingAreas } = require('../controllers/interestingAreasController');
+const { getReasons } = require('../controllers/reasonsController');
+const { getPackageItems } = require('../controllers/packageItemsController');
 /* Rutas de la API
  * 
  * Aquí definimos los puntos de acceso y los vinculamos a sus controladores.
@@ -32,6 +36,19 @@ router.get('/idiomas', getIdiomas);
 // Endpoint de estados civiles
 router.get('/estados-civiles', getMaritalStatuses);
 
+// Endpoint de niveles laborales
+router.get('/niveles-laborales', getLevels);
+
+// Endpoint de áreas de expertiz
+router.get('/areas-expertiz', getInterestingAreas);
+
+// Endpoint de motivos de retiro
+router.get('/motivos-retiro', getReasons);
+
+// Endpoint de paquetes de desvinculación
+router.get('/paquetes-desvinculacion', getPackageItems);
+
+// Endpoint de tecnologias
 router.get('/tecnologias', getTecnologias);
 
 

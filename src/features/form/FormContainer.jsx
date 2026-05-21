@@ -5,6 +5,7 @@ import { useFormStep } from '../../hooks/useFormStep';
 import { useCatalogs } from '../../hooks/useCatalogs';
 import WelcomeScreen from './components/WelcomeScreen';
 import QuestionView from './components/QuestionView';
+import WorkExperienceSection from './components/WorkExperienceSection';
 import { FORM_PHASES, QUESTIONS } from './constants';
 
 const FormContainer = () => {
@@ -25,9 +26,13 @@ const FormContainer = () => {
     fetchEstadosCiviles,
     fetchProfesiones,
     fetchIdiomas,
-    fetchTecnologias
+    fetchTecnologias,
+    fetchLevels,
+    fetchInterestingAreas,
+    fetchReasons,
+    fetchPackageItems
   } = useCatalogs();
-
+  console.log('FormContainer catalogs', catalogs);
   // Cargar catálogos dinámicos
   useEffect(() => {
     fetchCiudades();
@@ -36,6 +41,10 @@ const FormContainer = () => {
     fetchProfesiones();
     fetchIdiomas();
     fetchTecnologias();
+    fetchLevels();
+    fetchInterestingAreas();
+    fetchReasons();
+    fetchPackageItems();
   }, []);
 
   // Sincronizar opciones dinámicas con preguntas
@@ -147,6 +156,15 @@ const FormContainer = () => {
           >
             {isWelcome ? (
               <WelcomeScreen onStart={handleNext} />
+            ) : currentQuestion?.type === 'work_experience' ? (
+              <WorkExperienceSection
+                question={currentQuestion}
+                onNext={handleNext}
+                onPrev={handlePrev}
+                isFirst={currentStep === 1}
+                isLast={currentStep === totalSteps - 1}
+                catalogs={catalogs}
+              />
             ) : (
               <QuestionView
                 question={currentQuestion}

@@ -202,5 +202,14 @@ export const QUESTIONS = [
     required: false,
     isDynamic: true,
     options: [], // Se cargará dinámicamente desde el backend 
+  },
+  {
+    id: 'historia_laboral',
+    phaseId: 'work',
+    question: 'Historia Laboral',
+    description: 'Agrega tus experiencias laborales más relevantes.',
+    type: 'work_experience',
+    required: true,
   }
 ];
+

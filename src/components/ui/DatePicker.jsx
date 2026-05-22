@@ -45,9 +45,9 @@ export function DatePicker({
             type="button"
             className={cn(
               "w-full flex items-center justify-between bg-transparent border-b-2 py-6 text-2xl md:text-4xl transition-colors duration-500 font-light text-left group",
-              !value ? "text-text-primary/40" : "text-text-primary",
-              error ? "border-red-500" : "border-border-primary hover:border-text-primary/50",
-              isOpen && !error && "border-accent-primary"
+              !value ? "text-content-secondary/60" : "text-content-primary",
+              error ? "border-red-500" : "border-border-subtle hover:border-border-strong focus-visible:ring-2 focus-visible:ring-focus-ring",
+              isOpen && !error && "border-state-active-border"
             )}
           >
             <span>
@@ -59,14 +59,14 @@ export function DatePicker({
               {value && (
                 <div 
                   onClick={handleClear}
-                  className="p-2 rounded-full hover:bg-text-primary/10 transition-colors"
+                  className="p-2 rounded-full hover:bg-surface-hover transition-colors"
                 >
                   <X className="w-6 h-6 opacity-50 hover:opacity-100" />
                 </div>
               )}
               <CalendarIcon className={cn(
                 "w-8 h-8 transition-colors", 
-                isOpen ? "text-accent-primary" : "text-text-primary/50 group-hover:text-text-primary"
+                isOpen ? "text-action-primary" : "text-content-secondary group-hover:text-content-primary"
               )} />
             </div>
           </button>
@@ -75,11 +75,11 @@ export function DatePicker({
         {/* Línea animada de focus */}
         <div className={cn(
           "absolute bottom-0 left-0 h-[2px] transition-all duration-700 ease-in-out pointer-events-none",
-          error ? "bg-red-500 w-full" : isOpen ? "bg-accent-primary w-full" : "bg-accent-primary w-0 group-hover:w-full"
+          error ? "bg-red-500 w-full" : isOpen ? "bg-action-primary w-full" : "bg-action-primary w-0 group-hover:w-full"
         )} />
 
         <PopoverContent 
-          className="w-auto p-0 border-2 border-border-primary rounded-2xl shadow-2xl shadow-text-primary/10 bg-bg-primary overflow-hidden" 
+          className="w-auto p-0 border-2 border-border-subtle rounded-2xl shadow-[var(--shadow-premium)] bg-surface-dropdown overflow-hidden" 
           align="start"
           sideOffset={8}
         >

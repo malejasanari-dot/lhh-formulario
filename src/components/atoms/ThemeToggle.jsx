@@ -26,7 +26,7 @@ const ThemeToggle = () => {
   return (
     <button
       onClick={() => setIsLight(!isLight)}
-      className="p-3 rounded-xl bg-text-primary/5 border border-text-primary/10 text-text-primary hover:bg-text-primary/10 transition-all duration-300"
+      className="p-3 rounded-xl bg-surface-card border border-border-subtle text-content-primary hover:bg-surface-hover hover:border-border-strong hover:shadow-[var(--shadow-soft-card)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring transition-all duration-300"
       aria-label="Toggle Theme"
     >
       <AnimatePresence mode="wait" initial={false}>

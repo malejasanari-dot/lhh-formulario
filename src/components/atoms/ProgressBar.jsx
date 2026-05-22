@@ -3,9 +3,9 @@ import { motion } from 'framer-motion';
 
 const ProgressBar = ({ progress }) => {
   return (
-    <div className="fixed top-0 left-0 w-full h-1.5 bg-text-primary/10 z-50">
+    <div className="fixed top-0 left-0 w-full h-1.5 bg-progress-track z-50">
       <motion.div
-        className="h-full bg-accent-primary shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+        className="h-full bg-progress-fill shadow-[0_0_14px_var(--focus-ring)]"
         initial={{ width: 0 }}
         animate={{ width: `${progress}%` }}
         transition={{ type: "spring", stiffness: 50, damping: 20 }}

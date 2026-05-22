@@ -9,10 +9,10 @@ const WelcomeScreen = ({ onStart }) => {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="inline-block p-3 rounded-2xl bg-accent-primary/10 border border-accent-primary/20 mb-4"
+        className="inline-block p-3 rounded-2xl bg-badge-bg border border-badge-border mb-4 shadow-[var(--shadow-magenta-glow)]"
       >
-        <div className="w-12 h-12 bg-accent-primary rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.5)]">
-          <ArrowRight className="text-white w-6 h-6" />
+        <div className="w-12 h-12 bg-gradient-to-br from-lhh-primary-purple via-lhh-primary-magenta to-lhh-accent-pink rounded-xl flex items-center justify-center shadow-[var(--shadow-magenta-glow)]">
+          <ArrowRight className="text-action-primary-text w-6 h-6" />
         </div>
       </motion.div>
 
@@ -21,16 +21,16 @@ const WelcomeScreen = ({ onStart }) => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.6 }}
-          className="text-5xl md:text-8xl font-black text-text-primary tracking-tighter"
+          className="text-5xl md:text-8xl font-black text-content-primary tracking-tighter"
         >
-          COMPLETA TU <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">PERFIL</span>
+          COMPLETA TU <span className="text-transparent bg-clip-text bg-gradient-to-r from-lhh-primary-purple via-lhh-primary-magenta to-lhh-accent-pink">PERFIL</span>
         </motion.h1>
         
         <motion.p
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.6 }}
-          className="text-text-secondary text-lg md:text-2xl max-w-2xl mx-auto font-light leading-relaxed"
+          className="text-content-secondary text-lg md:text-2xl max-w-2xl mx-auto font-light leading-relaxed"
         >
           Mejora tus posibilidades y permite que encontremos mejores oportunidades para ti.
         </motion.p>
@@ -44,15 +44,15 @@ const WelcomeScreen = ({ onStart }) => {
       >
         <button
           onClick={onStart}
-          className="group relative px-10 py-5 bg-text-primary text-bg-primary font-bold rounded-full overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-text-primary/10"
+          className="group relative px-10 py-5 bg-gradient-to-r from-lhh-primary-magenta to-lhh-accent-pink text-action-primary-text font-bold rounded-full overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[var(--shadow-premium)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
         >
           <span className="relative z-10 flex items-center gap-2">
             Empezar ahora <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
           </span>
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+          <div className="absolute inset-0 bg-gradient-to-r from-lhh-primary-purple via-lhh-primary-magenta to-lhh-accent-pink translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-out" />
         </button>
         
-        <div className="mt-6 flex items-center justify-center gap-4 text-text-secondary text-xs font-semibold uppercase tracking-widest">
+        <div className="mt-6 flex items-center justify-center gap-4 text-content-secondary text-xs font-semibold uppercase tracking-widest">
           <span>Toma 2 min</span>
         </div>
       </motion.div>

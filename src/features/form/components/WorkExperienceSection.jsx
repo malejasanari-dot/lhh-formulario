@@ -175,7 +175,7 @@ export const WorkExperienceSection = ({
         <motion.span
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 text-accent-primary font-bold text-xs uppercase tracking-[0.2em]"
+          className="inline-flex items-center gap-2 text-badge-text font-bold text-xs uppercase tracking-[0.2em]"
         >
           <Sparkles className="w-3.5 h-3.5" />
           Historia Laboral
@@ -185,7 +185,7 @@ export const WorkExperienceSection = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-4xl md:text-5xl font-extrabold text-text-primary leading-[1.1] tracking-tight"
+          className="text-4xl md:text-5xl font-extrabold text-content-primary leading-[1.1] tracking-tight"
         >
           HISTORIA LABORAL
         </motion.h2>
@@ -194,7 +194,7 @@ export const WorkExperienceSection = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="text-text-secondary text-base md:text-lg font-light"
+          className="text-content-secondary text-base md:text-lg font-light"
         >
           Agrega tus experiencias laborales más relevantes.
         </motion.p>
@@ -253,7 +253,7 @@ export const WorkExperienceSection = ({
         <motion.button
           type="button"
           onClick={handleAddExperience}
-          className="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-border-primary hover:border-accent-primary/50 rounded-2xl text-text-secondary hover:text-text-primary font-bold text-xs uppercase tracking-widest transition-all duration-300 hover:bg-text-primary/5 cursor-pointer"
+          className="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-border-subtle hover:border-border-strong rounded-2xl text-content-secondary hover:text-content-primary font-bold text-xs uppercase tracking-widest transition-all duration-300 hover:bg-surface-hover hover:shadow-[var(--shadow-soft-card)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring cursor-pointer"
           whileHover={{ scale: 1.005 }}
           whileTap={{ scale: 0.995 }}
         >
@@ -286,7 +286,7 @@ export const WorkExperienceSection = ({
       >
         <button
           onClick={handleContinue}
-          className="flex items-center gap-2 px-10 py-5 font-bold rounded-2xl transition-all duration-300 group shadow-xl active:scale-95 bg-text-primary text-bg-primary hover:bg-accent-primary hover:text-white shadow-text-primary/5 cursor-pointer"
+          className="flex items-center gap-2 px-10 py-5 font-bold rounded-2xl transition-all duration-300 group active:scale-95 bg-gradient-to-r from-lhh-primary-magenta to-lhh-accent-pink text-action-primary-text hover:shadow-[var(--shadow-magenta-glow)] shadow-[var(--shadow-premium)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring cursor-pointer"
         >
           {isLast ? 'Finalizar' : 'Continuar'}
           <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
@@ -295,7 +295,7 @@ export const WorkExperienceSection = ({
         {!isFirst && (
           <button
             onClick={onPrev}
-            className="flex items-center gap-2 px-6 py-5 bg-text-primary/5 text-text-secondary font-bold rounded-2xl hover:bg-text-primary/10 hover:text-text-primary transition-all duration-300 active:scale-95 border border-border-primary cursor-pointer"
+            className="flex items-center gap-2 px-6 py-5 bg-surface-card text-content-secondary font-bold rounded-2xl hover:bg-surface-hover hover:text-content-primary hover:border-border-strong transition-all duration-300 active:scale-95 border border-border-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring cursor-pointer"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>

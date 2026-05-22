@@ -74,7 +74,7 @@ export const FormDropdown = ({
   return (
     <div className="relative w-full text-left" ref={dropdownRef}>
       {label && (
-        <span className="block text-[11px] font-bold text-text-secondary uppercase tracking-widest mb-1.5 pl-1">
+        <span className="block text-[11px] font-bold text-content-secondary uppercase tracking-widest mb-1.5 pl-1">
           {label}
         </span>
       )}
@@ -83,8 +83,8 @@ export const FormDropdown = ({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "w-full bg-text-primary/5 hover:bg-text-primary/[0.08] border border-border-primary rounded-xl px-4 py-3 text-sm flex items-center justify-between transition-all duration-300 focus:outline-none cursor-pointer",
-          isOpen && "border-accent-primary/50 ring-2 ring-accent-primary/10",
+          "w-full bg-surface-card hover:bg-surface-hover border border-border-subtle rounded-xl px-4 py-3 text-sm flex items-center justify-between transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring cursor-pointer",
+          isOpen && "border-border-strong ring-2 ring-focus-ring shadow-[var(--shadow-soft-card)]",
           error && "border-red-500/50"
         )}
       >
@@ -94,7 +94,7 @@ export const FormDropdown = ({
               selectedLabels.map((lbl, idx) => (
                 <span
                   key={idx}
-                  className="inline-flex items-center gap-1 bg-accent-primary/20 text-accent-primary text-xs font-semibold px-2 py-0.5 rounded-md border border-accent-primary/20"
+                  className="inline-flex items-center gap-1 bg-badge-bg text-badge-text text-xs font-semibold px-2 py-0.5 rounded-md border border-badge-border"
                 >
                   {lbl}
                   <span
@@ -103,28 +103,28 @@ export const FormDropdown = ({
                       const valToRemove = options.find(o => (o.label || o) === lbl)?.value || lbl;
                       handleSelect(valToRemove);
                     }}
-                    className="hover:bg-accent-primary/30 rounded p-0.5 cursor-pointer"
+                    className="hover:bg-surface-hover rounded p-0.5 cursor-pointer"
                   >
                     <X className="w-2.5 h-2.5" />
                   </span>
                 </span>
               ))
             ) : (
-              <span className="text-text-secondary/50 font-normal">{placeholder}</span>
+              <span className="text-content-secondary/60 font-normal">{placeholder}</span>
             )
           ) : (
             selectedLabels ? (
-              <span className="text-text-primary font-medium">{selectedLabels}</span>
+              <span className="text-content-primary font-medium">{selectedLabels}</span>
             ) : (
-              <span className="text-text-secondary/50 font-normal">{placeholder}</span>
+              <span className="text-content-secondary/60 font-normal">{placeholder}</span>
             )
           )}
         </div>
 
         <ChevronDown
           className={cn(
-            "w-4 h-4 text-text-secondary transition-transform duration-300 flex-shrink-0",
-            isOpen && "rotate-180 text-accent-primary"
+            "w-4 h-4 text-content-secondary transition-transform duration-300 flex-shrink-0",
+            isOpen && "rotate-180 text-action-primary"
           )}
         />
       </button>
@@ -136,25 +136,25 @@ export const FormDropdown = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 5, scale: 0.98 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-50 w-full mt-1.5 bg-bg-secondary border border-border-primary rounded-xl shadow-2xl overflow-hidden max-h-60 flex flex-col"
+            className="absolute z-50 w-full mt-1.5 bg-surface-dropdown border border-border-subtle rounded-xl shadow-[var(--shadow-premium)] overflow-hidden max-h-60 flex flex-col"
           >
             {shouldShowSearch && (
-              <div className="p-2 border-b border-border-primary/50 flex items-center gap-2 bg-text-primary/[0.02]">
-                <Search className="w-3.5 h-3.5 text-text-secondary" />
+              <div className="p-2 border-b border-border-subtle flex items-center gap-2 bg-surface-card">
+                <Search className="w-3.5 h-3.5 text-content-secondary" />
                 <input
                   autoFocus
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Buscar..."
-                  className="w-full bg-transparent border-0 p-1 text-sm focus:outline-none text-text-primary placeholder:text-text-secondary/30"
+                  className="w-full bg-transparent border-0 p-1 text-sm focus:outline-none text-content-primary placeholder:text-content-secondary/40"
                 />
               </div>
             )}
 
             <div className="overflow-y-auto flex-1 py-1 max-h-48">
               {filteredOptions.length === 0 ? (
-                <div className="px-4 py-3 text-xs text-text-secondary text-center">
+                <div className="px-4 py-3 text-xs text-content-secondary text-center">
                   No hay opciones
                 </div>
               ) : (
@@ -171,8 +171,8 @@ export const FormDropdown = ({
                       type="button"
                       onClick={() => handleSelect(optVal)}
                       className={cn(
-                        "w-full text-left px-4 py-2.5 text-xs transition-colors flex items-center justify-between hover:bg-text-primary/[0.03] cursor-pointer",
-                        isSelected ? "bg-accent-primary/10 text-accent-primary font-bold" : "text-text-primary font-medium"
+                        "w-full text-left px-4 py-2.5 text-xs transition-colors flex items-center justify-between hover:bg-surface-hover hover:shadow-[inset_3px_0_0_var(--state-active-border)] cursor-pointer",
+                        isSelected ? "bg-state-active-bg text-state-active-text font-bold" : "text-content-primary font-medium"
                       )}
                     >
                       <span className="truncate mr-2">{optLabel}</span>

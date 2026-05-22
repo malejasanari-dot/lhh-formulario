@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Check, AlertCircle, Plus, X, RefreshCw, Loader2, Upload, Camera, Search } from 'lucide-react';
 import { cn } from '../../../utils/cn';
 import { DatePicker } from '../../../components/ui/DatePicker';
+import { InternationalPhoneField } from '../../../components/ui/InternationalPhoneField';
 
 const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, isError, onRetry }) => {
   const [value, setValue] = useState(question.type === 'multiselect' ? [] : '');
@@ -110,7 +111,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
           key={`label-${question.id}`}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 text-accent-primary font-bold text-xs uppercase tracking-[0.2em]"
+          className="inline-flex items-center gap-2 text-badge-text font-bold text-xs uppercase tracking-[0.2em]"
         >
           {question.required ? <span className="text-red-500">*</span> : null}
           {question.id.replace('_', ' ').toUpperCase()}
@@ -121,7 +122,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-4xl md:text-6xl font-bold text-text-primary leading-[1.1] tracking-tight"
+          className="text-4xl md:text-6xl font-bold text-content-primary leading-[1.1] tracking-tight"
         >
           {question.question}
         </motion.h2>
@@ -132,7 +133,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-text-secondary text-lg md:text-xl font-light"
+            className="text-content-secondary text-lg md:text-xl font-light"
           >
             {question.description}
           </motion.p>
@@ -160,7 +161,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                           initial={{ scale: 0.8, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           exit={{ scale: 0.8, opacity: 0 }}
-                          className="flex flex-col gap-3 p-4 bg-text-primary/5 rounded-2xl border-2 border-border-primary min-w-[200px]"
+                          className="flex flex-col gap-3 p-4 bg-surface-card rounded-2xl border-2 border-border-subtle shadow-[var(--shadow-soft-card)] min-w-[200px]"
                         >
                           <div className="flex items-center justify-between gap-4">
                             <span className="text-base font-bold text-text-primary">{opt?.label || opt}</span>
@@ -175,20 +176,20 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                               <X className="w-4 h-4" />
                             </button>
                           </div>
-                          <div className="flex items-center gap-2 bg-bg-secondary rounded-xl p-2 border border-border-primary shadow-inner shadow-text-primary/5">
-                             <span className="text-[10px] font-bold text-text-secondary uppercase tracking-widest pl-2">Nivel:</span>
+                          <div className="flex items-center gap-2 bg-surface-card rounded-xl p-2 border border-border-subtle shadow-inner shadow-[var(--shadow-soft-card)]">
+                             <span className="text-[10px] font-bold text-content-secondary uppercase tracking-widest pl-2">Nivel:</span>
                              <div className="relative flex-1">
                                <select
                                  value={levels[v] || 'Básico'}
                                  onChange={(e) => setLevels(prev => ({ ...prev, [v]: e.target.value }))}
-                                 className="theme-select w-full rounded-lg bg-transparent px-2 py-1 text-sm font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 cursor-pointer appearance-none pr-7"
+                                 className="theme-select w-full rounded-lg bg-surface-dropdown px-2 py-1 text-sm font-medium text-content-primary border border-transparent hover:border-border-strong focus:outline-none focus:border-state-active-border focus:ring-2 focus:ring-focus-ring cursor-pointer appearance-none pr-7 transition-all duration-300"
                                >
-                                  <option value="Básico">Básico</option>
-                                  <option value="Intermedio">Intermedio</option>
-                                  <option value="Alto">Alto</option>
-                                  <option value="Avanzado">Avanzado</option>
+                                  <option className="theme-select-option" value="Básico">Básico</option>
+                                  <option className="theme-select-option" value="Intermedio">Intermedio</option>
+                                  <option className="theme-select-option" value="Alto">Alto</option>
+                                  <option className="theme-select-option" value="Avanzado">Avanzado</option>
                                </select>
-                               <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary">
+                               <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-content-secondary">
                                  <ChevronRight className="w-4 h-4 rotate-90" />
                                </div>
                              </div>
@@ -203,7 +204,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.8, opacity: 0 }}
-                        className="inline-flex items-center gap-1 px-3 py-1 bg-accent-primary text-white rounded-full text-sm font-medium"
+                        className="inline-flex items-center gap-1 px-3 py-1 bg-badge-bg text-badge-text border border-badge-border rounded-full text-sm font-medium"
                       >
                         {opt?.label || opt}
                         <button onClick={() => toggleOption(v)}>
@@ -233,13 +234,13 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                        ? (value.length > 0 ? 'Seleccionar más opciones...' : 'Selecciona una opción...')
                        : (value ? (question.options?.find(o => (o.value || o) === value)?.label || value) : 'Selecciona una opción...')}
                   </span>
-                  <div className="pointer-events-none text-text-secondary transition-transform duration-300 group-focus-within:text-accent-primary flex-shrink-0">
+                  <div className="pointer-events-none text-content-secondary transition-transform duration-300 group-focus-within:text-action-primary flex-shrink-0">
                     <ChevronRight className={cn("w-8 h-8 transition-transform duration-300", dropdownOpen ? "-rotate-90" : "rotate-90")} />
                   </div>
                 </button>
                 <div className={cn(
                   "absolute bottom-0 left-0 h-[2px] transition-all duration-700 ease-in-out",
-                  error ? "bg-red-500 w-full" : "bg-accent-primary w-0 group-focus-within:w-full"
+                  error ? "bg-red-500 w-full" : "bg-action-primary w-0 group-focus-within:w-full"
                 )} />
 
                 <AnimatePresence>
@@ -248,7 +249,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="absolute z-50 w-full mt-2 bg-bg-primary border-2 border-border-primary rounded-3xl shadow-2xl shadow-text-primary/10 max-h-[300px] overflow-hidden flex flex-col"
+                      className="absolute z-50 w-full mt-2 bg-surface-dropdown border-2 border-border-subtle rounded-3xl shadow-[var(--shadow-premium)] max-h-[300px] overflow-hidden flex flex-col"
                     >
                       {isLoading ? (
                         <div className="p-6 text-text-secondary animate-pulse font-medium">Cargando opciones...</div>
@@ -261,15 +262,15 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                       ) : (
                         <>
                           {shouldShowDropdownSearch && (
-                            <div className="p-4 border-b border-border-primary/50 bg-text-primary/[0.02] flex items-center gap-3">
-                              <Search className="w-5 h-5 text-text-secondary flex-shrink-0" />
+                            <div className="p-4 border-b border-border-subtle bg-surface-card flex items-center gap-3">
+                              <Search className="w-5 h-5 text-content-secondary flex-shrink-0" />
                               <input
                                 autoFocus
                                 type="text"
                                 value={dropdownSearchTerm}
                                 onChange={(e) => setDropdownSearchTerm(e.target.value)}
                                 placeholder="Buscar..."
-                                className="w-full bg-transparent border-0 text-lg text-text-primary placeholder:text-text-secondary/40 focus:outline-none"
+                                className="w-full bg-transparent border-0 text-lg text-content-primary placeholder:text-content-secondary/40 focus:outline-none"
                               />
                             </div>
                           )}
@@ -301,7 +302,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                                     }}
                                     className={cn(
                                       "w-full text-left px-6 py-4 transition-colors flex items-center justify-between border-b border-border-primary/30 last:border-0",
-                                      isSelected ? "bg-accent-primary/10 text-accent-primary font-bold" : "text-text-primary hover:bg-text-primary/5 font-medium"
+                                      isSelected ? "bg-state-active-bg text-state-active-text font-bold" : "text-content-primary hover:bg-surface-hover font-medium"
                                     )}
                                   >
                                     <span className="text-lg truncate pr-4">{optLabel}</span>
@@ -350,7 +351,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                       </div>
                       <button
                         onClick={onRetry}
-                        className="flex items-center gap-2 px-6 py-2 bg-text-primary text-bg-primary rounded-xl hover:bg-accent-primary hover:text-white transition-all font-bold"
+                        className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-lhh-primary-magenta to-lhh-accent-pink text-action-primary-text rounded-xl hover:shadow-[var(--shadow-magenta-glow)] transition-all font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
                       >
                         <RefreshCw className="w-4 h-4" />
                         Reintentar
@@ -393,8 +394,8 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                               "flex items-center justify-between border-2 transition-all duration-300 text-left group/btn",
                               isCompact ? "p-4 rounded-xl" : "p-6 rounded-2xl",
                               isSelected
-                                ? "bg-accent-primary border-accent-primary text-white shadow-lg shadow-accent-primary/20 scale-[1.02]"
-                                : "bg-text-primary/5 border-border-primary text-text-secondary hover:bg-text-primary/10 hover:border-text-primary/20"
+                                ? "bg-state-active-bg border-state-active-border text-state-active-text shadow-[var(--shadow-magenta-glow)] scale-[1.02]"
+                                : "bg-surface-card border-border-subtle text-content-secondary hover:bg-surface-hover hover:border-border-strong hover:shadow-[var(--shadow-soft-card)]"
                             )}
                           >
                             <div className={cn("flex items-center", isCompact ? "gap-3" : "gap-4")}>
@@ -432,7 +433,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
             <div
               className={cn(
                 "w-full h-64 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center space-y-4 transition-all duration-500 cursor-pointer group/upload",
-                value ? "border-accent-primary bg-accent-primary/5" : "border-border-primary hover:border-text-primary/20 hover:bg-text-primary/5"
+                value ? "border-state-active-border bg-state-active-bg" : "border-border-subtle hover:border-border-strong hover:bg-surface-hover"
               )}
               onClick={() => inputRef.current?.click()}
             >
@@ -450,7 +451,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
               />
               <div className={cn(
                 "p-5 rounded-2xl transition-all duration-500",
-                value ? "bg-accent-primary text-white scale-110" : "bg-text-primary/5 text-text-secondary group-hover/upload:scale-110"
+                value ? "bg-action-primary text-action-primary-text scale-110" : "bg-surface-card text-content-secondary group-hover/upload:scale-110"
               )}>
                 {value ? <Camera className="w-8 h-8" /> : <Upload className="w-8 h-8" />}
               </div>
@@ -486,42 +487,28 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
               }}
               className={cn(
                 "w-full bg-transparent border-b-2 py-6 text-2xl md:text-4xl text-text-primary focus:outline-none transition-colors duration-500 font-light",
-                error ? "border-red-500" : "border-border-primary focus:border-accent-primary"
+                error ? "border-red-500" : "border-border-subtle focus:border-border-strong"
               )}
             />
             <div className={cn(
               "absolute bottom-0 left-0 h-[2px] transition-all duration-700 ease-in-out",
-              error ? "bg-red-500 w-full" : "bg-accent-primary w-0 group-focus-within:w-full"
+              error ? "bg-red-500 w-full" : "bg-action-primary w-0 group-focus-within:w-full"
             )} />
           </>
         ) : question.type === 'tel' ? (
-          <div className="flex items-end gap-4 w-full md:w-2/3">
-            <div className="flex-shrink-0 flex items-center gap-2 border-b-2 border-border-primary py-6 text-2xl md:text-4xl text-text-primary font-light opacity-90 cursor-default">
-              <span>🇨🇴</span>
-              <span className="text-text-secondary">+57</span>
-            </div>
-            <div className="relative flex-1 group">
-              <input
-                autoFocus
-                ref={inputRef}
-                type="tel"
-                value={value}
-                onChange={(e) => {
-                  setValue(e.target.value);
-                  if (error) setError(null);
-                }}
-                placeholder={question.placeholder || 'Escribe tu respuesta aquí...'}
-                className={cn(
-                  "w-full bg-transparent border-b-2 py-6 text-2xl md:text-4xl text-text-primary placeholder:text-text-primary/10 focus:outline-none transition-colors duration-500 font-light",
-                  error ? "border-red-500" : "border-border-primary focus:border-accent-primary"
-                )}
-                onKeyDown={handleKeyDown}
-              />
-              <div className={cn(
-                "absolute bottom-0 left-0 h-[2px] transition-all duration-700 ease-in-out",
-                error ? "bg-red-500 w-full" : "bg-accent-primary w-0 group-focus-within:w-full"
-              )} />
-            </div>
+          <div className="w-full md:w-2/3">
+            <InternationalPhoneField
+              value={value}
+              onChange={(phoneValue) => {
+                setValue(phoneValue);
+                if (error) setError(null);
+              }}
+              onKeyDown={handleKeyDown}
+              placeholder={question.placeholder || 'Escribe tu respuesta aqu�...'}
+              hasError={Boolean(error)}
+              autoFocus
+              defaultCountry="co"
+            />
           </div>
         ) : (
           <>
@@ -537,13 +524,13 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
               placeholder={question.placeholder || 'Escribe tu respuesta aquí...'}
               className={cn(
                 "w-full bg-transparent border-b-2 py-6 text-2xl md:text-4xl text-text-primary placeholder:text-text-primary/10 focus:outline-none transition-colors duration-500 font-light",
-                error ? "border-red-500" : "border-border-primary focus:border-accent-primary"
+                error ? "border-red-500" : "border-border-subtle focus:border-border-strong"
               )}
               onKeyDown={handleKeyDown}
             />
             <div className={cn(
               "absolute bottom-0 left-0 h-[2px] transition-all duration-700 ease-in-out",
-              error ? "bg-red-500 w-full" : "bg-accent-primary w-0 group-focus-within:w-full"
+              error ? "bg-red-500 w-full" : "bg-action-primary w-0 group-focus-within:w-full"
             )} />
           </>
         )}
@@ -575,8 +562,8 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
           className={cn(
             "flex items-center gap-2 px-10 py-5 font-bold rounded-2xl transition-all duration-300 group shadow-xl active:scale-95",
             !isValueValid
-              ? "bg-text-primary/5 text-text-secondary cursor-not-allowed border border-border-primary"
-              : "bg-text-primary text-bg-primary hover:bg-accent-primary hover:text-white shadow-text-primary/5"
+              ? "bg-surface-card text-content-secondary cursor-not-allowed border border-border-subtle"
+              : "bg-gradient-to-r from-lhh-primary-magenta to-lhh-accent-pink text-action-primary-text hover:shadow-[var(--shadow-magenta-glow)] shadow-action-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           )}
         >
           {isLast ? 'Finalizar' : 'Continuar'}
@@ -595,7 +582,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
         {!isFirst && (
           <button
             onClick={onPrev}
-            className="flex items-center gap-2 px-6 py-5 bg-text-primary/5 text-text-secondary font-bold rounded-2xl hover:bg-text-primary/10 hover:text-text-primary transition-all duration-300 active:scale-95 border border-border-primary"
+            className="flex items-center gap-2 px-6 py-5 bg-surface-card text-content-secondary font-bold rounded-2xl hover:bg-surface-hover hover:text-content-primary hover:border-border-strong transition-all duration-300 active:scale-95 border border-border-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -606,3 +593,4 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
 };
 
 export default QuestionView;
+

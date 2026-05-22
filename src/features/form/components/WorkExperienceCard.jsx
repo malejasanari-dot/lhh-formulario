@@ -45,17 +45,17 @@ export const WorkExperienceCard = ({
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -15 }}
-      className="w-full bg-text-primary/[0.02] border border-border-primary rounded-3xl p-6 md:p-8 shadow-2xl relative backdrop-blur-sm overflow-visible"
+      className="w-full bg-surface-card border border-border-subtle rounded-3xl p-6 md:p-8 shadow-[var(--shadow-soft-card)] relative backdrop-blur-sm overflow-visible"
     >
       {/* Decorative top gradient border */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-accent-primary/20 via-accent-primary to-purple-500/20" />
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-lhh-primary-purple via-lhh-primary-magenta to-lhh-accent-pink opacity-90" />
 
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-accent-primary/10 flex items-center justify-center text-accent-primary">
+          <div className="w-8 h-8 rounded-lg bg-badge-bg flex items-center justify-center text-badge-text border border-badge-border">
             <Briefcase className="w-4 h-4" />
           </div>
-          <span className="text-xs font-bold uppercase tracking-widest text-text-primary opacity-80">
+          <span className="text-xs font-bold uppercase tracking-widest text-content-primary opacity-90">
             {experience.empresa || 'Nueva Experiencia'}
           </span>
         </div>
@@ -75,7 +75,7 @@ export const WorkExperienceCard = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
         {/* Empresa */}
         <div className="space-y-1">
-          <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-widest pl-1">
+          <label className="block text-[11px] font-bold text-content-secondary uppercase tracking-widest pl-1">
             Empresa
           </label>
           <input
@@ -84,8 +84,8 @@ export const WorkExperienceCard = ({
             onChange={(e) => handleFieldChange('empresa', e.target.value)}
             placeholder="Ej: Bancolombia, Google..."
             className={cn(
-              "w-full bg-text-primary/5 border rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/10 transition-all duration-300",
-              errors.empresa ? "border-red-500/50" : "border-border-primary"
+              "w-full bg-surface-card border rounded-xl px-4 py-3 text-sm text-content-primary placeholder:text-content-secondary/40 focus:outline-none focus:border-border-strong focus:ring-2 focus:ring-focus-ring focus:shadow-[var(--shadow-soft-card)] transition-all duration-300",
+              errors.empresa ? "border-red-500/50" : "border-border-subtle"
             )}
           />
           {errors.empresa && (
@@ -105,7 +105,7 @@ export const WorkExperienceCard = ({
 
         {/* Cargo */}
         <div className="space-y-1">
-          <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-widest pl-1">
+          <label className="block text-[11px] font-bold text-content-secondary uppercase tracking-widest pl-1">
             Cargo
           </label>
           <input
@@ -114,8 +114,8 @@ export const WorkExperienceCard = ({
             onChange={(e) => handleFieldChange('cargo', e.target.value)}
             placeholder="Ej: Coordinador de Proyectos, Ingeniero..."
             className={cn(
-              "w-full bg-text-primary/5 border rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/10 transition-all duration-300",
-              errors.cargo ? "border-red-500/50" : "border-border-primary"
+              "w-full bg-surface-card border rounded-xl px-4 py-3 text-sm text-content-primary placeholder:text-content-secondary/40 focus:outline-none focus:border-border-strong focus:ring-2 focus:ring-focus-ring focus:shadow-[var(--shadow-soft-card)] transition-all duration-300",
+              errors.cargo ? "border-red-500/50" : "border-border-subtle"
             )}
           />
           {errors.cargo && (
@@ -135,7 +135,7 @@ export const WorkExperienceCard = ({
 
         {/* Función principal en el cargo */}
         <div className="col-span-1 md:col-span-2 space-y-1">
-          <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-widest pl-1">
+          <label className="block text-[11px] font-bold text-content-secondary uppercase tracking-widest pl-1">
             Función principal en el cargo
           </label>
           <textarea
@@ -144,8 +144,8 @@ export const WorkExperienceCard = ({
             placeholder="Describe brevemente tus responsabilidades principales y logros..."
             rows={3}
             className={cn(
-              "w-full bg-text-primary/5 border rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/10 transition-all duration-300 resize-none",
-              errors.funcionPrincipal ? "border-red-500/50" : "border-border-primary"
+              "w-full bg-surface-card border rounded-xl px-4 py-3 text-sm text-content-primary placeholder:text-content-secondary/40 focus:outline-none focus:border-border-strong focus:ring-2 focus:ring-focus-ring focus:shadow-[var(--shadow-soft-card)] transition-all duration-300 resize-none",
+              errors.funcionPrincipal ? "border-red-500/50" : "border-border-subtle"
             )}
           />
           {errors.funcionPrincipal && (
@@ -169,11 +169,11 @@ export const WorkExperienceCard = ({
 
         {/* Último salario */}
         <div className="space-y-1">
-          <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-widest pl-1">
+          <label className="block text-[11px] font-bold text-content-secondary uppercase tracking-widest pl-1">
             Último salario (Mensual)
           </label>
           <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary/50 flex items-center pointer-events-none">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-content-secondary/60 flex items-center pointer-events-none">
               <DollarSign className="w-4 h-4" />
             </div>
             <input
@@ -187,8 +187,8 @@ export const WorkExperienceCard = ({
               }}
               placeholder="Ej: 5.000.000"
               className={cn(
-                "w-full bg-text-primary/5 border rounded-xl pl-9 pr-4 py-3 text-sm text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/10 transition-all duration-300",
-                errors.ultimoSalario ? "border-red-500/50" : "border-border-primary"
+                "w-full bg-surface-card border rounded-xl pl-9 pr-4 py-3 text-sm text-content-primary placeholder:text-content-secondary/40 focus:outline-none focus:border-border-strong focus:ring-2 focus:ring-focus-ring focus:shadow-[var(--shadow-soft-card)] transition-all duration-300",
+                errors.ultimoSalario ? "border-red-500/50" : "border-border-subtle"
               )}
             />
           </div>
@@ -199,7 +199,7 @@ export const WorkExperienceCard = ({
 
         {/* Fecha de retiro */}
         <div className="space-y-1">
-          <label className="block text-[11px] font-bold text-text-secondary uppercase tracking-widest pl-1">
+          <label className="block text-[11px] font-bold text-content-secondary uppercase tracking-widest pl-1">
             Fecha de retiro
           </label>
           <div className="relative">
@@ -208,8 +208,8 @@ export const WorkExperienceCard = ({
               value={experience.fechaRetiro || ''}
               onChange={(e) => handleFieldChange('fechaRetiro', e.target.value)}
               className={cn(
-                "w-full bg-text-primary/5 border rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/10 transition-all duration-300 color-scheme-dark",
-                errors.fechaRetiro ? "border-red-500/50" : "border-border-primary"
+                "w-full bg-surface-card border rounded-xl px-4 py-2.5 text-sm text-content-primary placeholder:text-content-secondary/40 focus:outline-none focus:border-border-strong focus:ring-2 focus:ring-focus-ring focus:shadow-[var(--shadow-soft-card)] transition-all duration-300 color-scheme-dark",
+                errors.fechaRetiro ? "border-red-500/50" : "border-border-subtle"
               )}
             />
           </div>

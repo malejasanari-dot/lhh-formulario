@@ -1,25 +1,98 @@
 @import "tailwindcss";
 
 @theme {
+  --color-lhh-base-dark: var(--lhh-base-dark);
+  --color-lhh-primary-purple: var(--lhh-primary-purple);
+  --color-lhh-primary-magenta: var(--lhh-primary-magenta);
+  --color-lhh-accent-pink: var(--lhh-accent-pink);
+  --color-lhh-highlight-yellow: var(--lhh-highlight-yellow);
+  --color-lhh-white: var(--lhh-white);
+
   --color-bg-primary: var(--bg-primary);
   --color-bg-secondary: var(--bg-secondary);
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-border-primary: var(--border-primary);
   --color-accent-primary: var(--accent-primary);
+
+  --color-surface-app: var(--surface-app);
+  --color-surface-panel: var(--surface-panel);
+  --color-surface-card: var(--surface-card);
+  --color-surface-dropdown: var(--surface-dropdown);
+  --color-surface-hover: var(--surface-hover);
+  --color-content-primary: var(--content-primary);
+  --color-content-secondary: var(--content-secondary);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-action-primary: var(--action-primary);
+  --color-action-primary-hover: var(--action-primary-hover);
+  --color-action-primary-active: var(--action-primary-active);
+  --color-action-primary-text: var(--action-primary-text);
+  --color-focus-ring: var(--focus-ring);
+  --color-progress-track: var(--progress-track);
+  --color-progress-fill: var(--progress-fill);
+  --color-badge-bg: var(--badge-bg);
+  --color-badge-text: var(--badge-text);
+  --color-badge-border: var(--badge-border);
+  --color-state-active-bg: var(--state-active-bg);
+  --color-state-active-text: var(--state-active-text);
+  --color-state-active-border: var(--state-active-border);
 }
 
 :root {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* LHH Brand Palette */
+  --lhh-base-dark: #050505;
+  --lhh-primary-purple: #5b1d6d;
+  --lhh-primary-magenta: #c1007e;
+  --lhh-accent-pink: #f94f71;
+  --lhh-highlight-yellow: #ebdd4f;
+  --lhh-white: #ffffff;
+
+  --lhh-primary-purple-rgb: 91, 29, 109;
+  --lhh-primary-magenta-rgb: 193, 0, 126;
+  --lhh-accent-pink-rgb: 249, 79, 113;
+  --lhh-highlight-yellow-rgb: 235, 221, 79;
+  --lhh-white-rgb: 255, 255, 255;
   
-  /* Dark Theme (Default) */
+  /* Legacy Theme Aliases */
   --bg-primary: #000000;
   --bg-secondary: #0a0a0a;
-  --bg-gradient: radial-gradient(circle at top center, #1a1a1a 0%, #000000 100%);
+  --bg-gradient: radial-gradient(circle at 20% 0%, rgba(var(--lhh-primary-purple-rgb), 0.22) 0%, transparent 34%), radial-gradient(circle at 85% 12%, rgba(var(--lhh-primary-magenta-rgb), 0.14) 0%, transparent 28%), var(--lhh-base-dark);
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.4);
   --border-primary: rgba(255, 255, 255, 0.05);
   --accent-primary: #3b82f6;
+  --accent-primary-rgb: 59, 130, 246;
+
+  /* LHH Dark Theme Semantics */
+  --surface-app: var(--lhh-base-dark);
+  --surface-panel: #0d0a0f;
+  --surface-card: rgba(var(--lhh-white-rgb), 0.04);
+  --surface-dropdown: #111014;
+  --surface-hover: rgba(var(--lhh-white-rgb), 0.08);
+  --content-primary: var(--lhh-white);
+  --content-secondary: rgba(var(--lhh-white-rgb), 0.64);
+  --border-subtle: rgba(var(--lhh-white-rgb), 0.08);
+  --border-strong: rgba(var(--lhh-highlight-yellow-rgb), 0.22);
+  --action-primary: var(--lhh-primary-magenta);
+  --action-primary-hover: var(--lhh-accent-pink);
+  --action-primary-active: var(--lhh-primary-purple);
+  --action-primary-text: var(--lhh-white);
+  --focus-ring: rgba(var(--lhh-accent-pink-rgb), 0.42);
+  --progress-track: rgba(var(--lhh-white-rgb), 0.1);
+  --progress-fill: var(--lhh-primary-magenta);
+  --progress-gradient: linear-gradient(90deg, var(--lhh-primary-purple), var(--lhh-primary-magenta), var(--lhh-accent-pink));
+  --badge-bg: rgba(var(--lhh-primary-magenta-rgb), 0.16);
+  --badge-text: var(--lhh-highlight-yellow);
+  --badge-border: rgba(var(--lhh-highlight-yellow-rgb), 0.28);
+  --state-active-bg: rgba(var(--lhh-primary-magenta-rgb), 0.18);
+  --state-active-text: var(--lhh-white);
+  --state-active-border: var(--lhh-accent-pink);
+  --shadow-premium: 0 24px 80px rgba(var(--lhh-primary-purple-rgb), 0.2);
+  --shadow-soft-card: 0 18px 55px rgba(0, 0, 0, 0.24);
+  --shadow-magenta-glow: 0 0 26px rgba(var(--lhh-primary-magenta-rgb), 0.32);
   
   font-family: var(--font-sans);
   line-height: 1.5;
@@ -39,11 +112,40 @@
 :root.light {
   --bg-primary: #ffffff;
   --bg-secondary: #f9fafb;
-  --bg-gradient: radial-gradient(circle at top center, #f0f4ff 0%, #ffffff 100%);
+  --bg-gradient: radial-gradient(circle at 20% 0%, rgba(var(--lhh-primary-purple-rgb), 0.08) 0%, transparent 34%), radial-gradient(circle at 85% 12%, rgba(var(--lhh-primary-magenta-rgb), 0.08) 0%, transparent 28%), var(--lhh-white);
   --text-primary: #111827;
   --text-secondary: #6b7280;
   --border-primary: rgba(0, 0, 0, 0.05);
   --accent-primary: #2563eb;
+  --accent-primary-rgb: 37, 99, 235;
+
+  /* LHH Light Theme Semantics */
+  --surface-app: var(--lhh-white);
+  --surface-panel: #fbf8fc;
+  --surface-card: rgba(var(--lhh-primary-purple-rgb), 0.035);
+  --surface-dropdown: var(--lhh-white);
+  --surface-hover: rgba(var(--lhh-primary-purple-rgb), 0.07);
+  --content-primary: #1c1420;
+  --content-secondary: rgba(28, 20, 32, 0.68);
+  --border-subtle: rgba(var(--lhh-primary-purple-rgb), 0.12);
+  --border-strong: rgba(var(--lhh-primary-magenta-rgb), 0.28);
+  --action-primary: var(--lhh-primary-magenta);
+  --action-primary-hover: var(--lhh-primary-purple);
+  --action-primary-active: #461655;
+  --action-primary-text: var(--lhh-white);
+  --focus-ring: rgba(var(--lhh-primary-magenta-rgb), 0.32);
+  --progress-track: rgba(var(--lhh-primary-purple-rgb), 0.12);
+  --progress-fill: var(--lhh-primary-magenta);
+  --progress-gradient: linear-gradient(90deg, var(--lhh-primary-purple), var(--lhh-primary-magenta), var(--lhh-accent-pink));
+  --badge-bg: rgba(var(--lhh-highlight-yellow-rgb), 0.35);
+  --badge-text: var(--lhh-primary-purple);
+  --badge-border: rgba(var(--lhh-primary-purple-rgb), 0.16);
+  --state-active-bg: rgba(var(--lhh-primary-magenta-rgb), 0.1);
+  --state-active-text: var(--lhh-primary-purple);
+  --state-active-border: var(--lhh-primary-magenta);
+  --shadow-premium: 0 22px 70px rgba(var(--lhh-primary-purple-rgb), 0.12);
+  --shadow-soft-card: 0 18px 45px rgba(var(--lhh-primary-purple-rgb), 0.08);
+  --shadow-magenta-glow: 0 0 22px rgba(var(--lhh-primary-magenta-rgb), 0.18);
   color-scheme: light;
 }
 
@@ -61,8 +163,10 @@ body {
 }
 
 select.theme-select {
-  color: var(--text-primary);
-  background-color: transparent;
+  color: var(--content-primary) !important;
+  background-color: var(--surface-dropdown) !important;
+  border-color: transparent;
+  accent-color: var(--action-primary);
   color-scheme: dark;
 }
 
@@ -70,12 +174,134 @@ select.theme-select {
   color-scheme: light;
 }
 
-select.theme-select option {
-  color: var(--text-primary);
-  background-color: var(--bg-secondary);
+select.theme-select option,
+select.theme-select .theme-select-option {
+  color: var(--content-primary) !important;
+  background-color: var(--surface-dropdown) !important;
 }
 
-select.theme-select option:checked {
-  color: #ffffff;
-  background-color: var(--accent-primary);
+select.theme-select option:hover,
+select.theme-select option:focus,
+select.theme-select .theme-select-option:hover,
+select.theme-select .theme-select-option:focus {
+  color: var(--state-active-text) !important;
+  background-color: var(--state-active-bg) !important;
+}
+
+select.theme-select option:checked,
+select.theme-select .theme-select-option:checked {
+  color: var(--action-primary-text) !important;
+  background-color: var(--action-primary) !important;
+  box-shadow: inset 0 0 0 999px var(--action-primary);
+}
+
+select.theme-select:focus-visible {
+  box-shadow: 0 0 0 2px var(--focus-ring), var(--shadow-soft-card);
+}
+
+.lhh-phone-field {
+  --phone-height: 68px;
+}
+
+.lhh-phone-field .lhh-phone-container.react-tel-input {
+  width: 100%;
+  display: flex;
+}
+
+.lhh-phone-field .lhh-phone-button.form-control {
+  height: var(--phone-height);
+  width: 84px;
+  border-radius: 12px 0 0 12px;
+  border: 1px solid var(--border-subtle);
+  border-right: 0;
+  background: var(--surface-card);
+}
+
+.lhh-phone-field .lhh-phone-button.form-control:hover {
+  background: var(--surface-hover);
+}
+
+.lhh-phone-field .lhh-phone-input.form-control {
+  width: 100%;
+  height: var(--phone-height);
+  border-radius: 0 12px 12px 0;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-dropdown);
+  color: var(--content-primary);
+  font-size: 1.25rem;
+  font-weight: 500;
+  padding-left: 84px;
+  padding-right: 16px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+.lhh-phone-field .lhh-phone-input.form-control::placeholder {
+  color: color-mix(in srgb, var(--content-secondary) 72%, transparent);
+}
+
+.lhh-phone-field .lhh-phone-container.react-tel-input:focus-within .lhh-phone-button.form-control,
+.lhh-phone-field .lhh-phone-container.react-tel-input:focus-within .lhh-phone-input.form-control {
+  border-color: var(--state-active-border);
+  box-shadow: 0 0 0 2px var(--focus-ring);
+}
+
+.lhh-phone-field .lhh-phone-container.react-tel-input.has-error .lhh-phone-button.form-control,
+.lhh-phone-field .lhh-phone-container.react-tel-input.has-error .lhh-phone-input.form-control {
+  border-color: #ef4444;
+}
+
+.lhh-phone-field .lhh-phone-dropdown.country-list {
+  margin-top: 10px;
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-dropdown);
+  box-shadow: var(--shadow-premium);
+  color: var(--content-primary);
+}
+
+.lhh-phone-field .lhh-phone-dropdown .search {
+  background: transparent;
+  padding: 10px;
+}
+
+.lhh-phone-field .lhh-phone-dropdown .search-box,
+.lhh-phone-field .lhh-phone-search {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-card);
+  color: var(--content-primary);
+  padding: 8px 10px;
+}
+
+.lhh-phone-field .lhh-phone-dropdown .search-box:focus,
+.lhh-phone-field .lhh-phone-search:focus {
+  border-color: var(--state-active-border);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--focus-ring);
+}
+
+.lhh-phone-field .lhh-phone-dropdown .country {
+  color: var(--content-primary);
+  transition: background-color 0.2s ease;
+}
+
+.lhh-phone-field .lhh-phone-dropdown .country .dial-code {
+  color: var(--content-secondary);
+}
+
+.lhh-phone-field .lhh-phone-dropdown .country:hover,
+.lhh-phone-field .lhh-phone-dropdown .country.highlight,
+.lhh-phone-field .lhh-phone-dropdown .country.active {
+  background: var(--state-active-bg);
+}
+
+.lhh-phone-field .lhh-phone-dropdown .country.active .dial-code,
+.lhh-phone-field .lhh-phone-dropdown .country.highlight .dial-code {
+  color: var(--state-active-text);
+}
+
+.lhh-phone-field .lhh-phone-dropdown .country.active .country-name,
+.lhh-phone-field .lhh-phone-dropdown .country.highlight .country-name {
+  color: var(--state-active-text);
 }

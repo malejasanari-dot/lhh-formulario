@@ -17,6 +17,7 @@ export const FormDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef(null);
+  const shouldShowSearch = showSearch || options.length > 6;
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -28,6 +29,12 @@ export const FormDropdown = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchTerm('');
+    }
+  }, [isOpen]);
 
   const handleSelect = (optionValue) => {
     if (multiselect) {
@@ -59,7 +66,7 @@ export const FormDropdown = ({
 
   const filteredOptions = options.filter(option => {
     const optLabel = option.label || option;
-    return optLabel.toLowerCase().includes(searchTerm.toLowerCase());
+    return String(optLabel).toLowerCase().includes(searchTerm.toLowerCase());
   });
 
   const selectedLabels = getSelectedLabel();
@@ -131,10 +138,11 @@ export const FormDropdown = ({
             transition={{ duration: 0.15 }}
             className="absolute z-50 w-full mt-1.5 bg-bg-secondary border border-border-primary rounded-xl shadow-2xl overflow-hidden max-h-60 flex flex-col"
           >
-            {showSearch && (
+            {shouldShowSearch && (
               <div className="p-2 border-b border-border-primary/50 flex items-center gap-2 bg-text-primary/[0.02]">
                 <Search className="w-3.5 h-3.5 text-text-secondary" />
                 <input
+                  autoFocus
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}

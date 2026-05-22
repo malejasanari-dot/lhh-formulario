@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, Check, AlertCircle, Plus, X, RefreshCw, Loader2, Upload, Camera } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, AlertCircle, Plus, X, RefreshCw, Loader2, Upload, Camera, Search } from 'lucide-react';
 import { cn } from '../../../utils/cn';
 import { DatePicker } from '../../../components/ui/DatePicker';
 
@@ -10,12 +10,14 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
   const [error, setError] = useState(null);
   const [showAllOptions, setShowAllOptions] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownSearchTerm, setDropdownSearchTerm] = useState('');
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
   
   const isCompact = question.variant === 'compact';
   const maxVisible = isCompact ? 9 : 6;
   const isDropdown = question.variant === 'dropdown' || (question.options?.length > 6);
+  const shouldShowDropdownSearch = (question.options?.length || 0) > 6;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -35,7 +37,14 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
     setError(null);
     setShowAllOptions(false);
     setDropdownOpen(false);
+    setDropdownSearchTerm('');
   }, [question.id, question.type]);
+
+  useEffect(() => {
+    if (!dropdownOpen) {
+      setDropdownSearchTerm('');
+    }
+  }, [dropdownOpen]);
 
   const handleNext = () => {
     if (question.required) {
@@ -87,6 +96,12 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
 
   const visibleOptions = showAllOptions ? question.options : question.options?.slice(0, maxVisible);
   const hasMoreOptions = question.options?.length > maxVisible;
+  const filteredDropdownOptions = shouldShowDropdownSearch
+    ? question.options?.filter((option) => {
+      const optionLabel = option.label || option;
+      return String(optionLabel).toLowerCase().includes(dropdownSearchTerm.toLowerCase());
+    })
+    : question.options;
 
   return (
     <div className="space-y-12 w-full">
@@ -233,7 +248,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="absolute z-50 w-full mt-2 bg-bg-primary border-2 border-border-primary rounded-3xl shadow-2xl shadow-text-primary/10 max-h-[300px] overflow-y-auto overflow-x-hidden"
+                      className="absolute z-50 w-full mt-2 bg-bg-primary border-2 border-border-primary rounded-3xl shadow-2xl shadow-text-primary/10 max-h-[300px] overflow-hidden flex flex-col"
                     >
                       {isLoading ? (
                         <div className="p-6 text-text-secondary animate-pulse font-medium">Cargando opciones...</div>
@@ -244,41 +259,63 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                       ) : !question.options || question.options.length === 0 ? (
                         <div className="p-6 text-text-secondary font-medium">No hay opciones disponibles</div>
                       ) : (
-                        question.options.map((option) => {
-                          const optValue = option.value || option;
-                          const optLabel = option.label || option;
-                          const isSelected = question.type === 'multiselect' 
-                             ? (Array.isArray(value) && value.includes(optValue))
-                             : value === optValue;
+                        <>
+                          {shouldShowDropdownSearch && (
+                            <div className="p-4 border-b border-border-primary/50 bg-text-primary/[0.02] flex items-center gap-3">
+                              <Search className="w-5 h-5 text-text-secondary flex-shrink-0" />
+                              <input
+                                autoFocus
+                                type="text"
+                                value={dropdownSearchTerm}
+                                onChange={(e) => setDropdownSearchTerm(e.target.value)}
+                                placeholder="Buscar..."
+                                className="w-full bg-transparent border-0 text-lg text-text-primary placeholder:text-text-secondary/40 focus:outline-none"
+                              />
+                            </div>
+                          )}
 
-                          return (
-                            <button
-                              key={optValue}
-                              type="button"
-                              onClick={() => {
-                                if (question.type === 'multiselect') {
-                                  toggleOption(optValue);
-                                } else {
-                                  setValue(optValue);
-                                  setError(null);
-                                  setDropdownOpen(false);
-                                  setTimeout(() => onNext(optValue), 300);
-                                }
-                              }}
-                              className={cn(
-                                "w-full text-left px-6 py-4 transition-colors flex items-center justify-between border-b border-border-primary/30 last:border-0",
-                                isSelected ? "bg-accent-primary/10 text-accent-primary font-bold" : "text-text-primary hover:bg-text-primary/5 font-medium"
-                              )}
-                            >
-                              <span className="text-lg truncate pr-4">{optLabel}</span>
-                              {isSelected ? (
-                                <Check className="w-5 h-5 flex-shrink-0" />
-                              ) : (
-                                question.type === 'multiselect' && <Plus className="w-5 h-5 opacity-0 hover:opacity-100 text-text-secondary flex-shrink-0 transition-opacity" />
-                              )}
-                            </button>
-                          );
-                        })
+                          <div className="overflow-y-auto overflow-x-hidden flex-1">
+                            {filteredDropdownOptions.length === 0 ? (
+                              <div className="p-6 text-text-secondary font-medium">No hay opciones disponibles</div>
+                            ) : (
+                              filteredDropdownOptions.map((option) => {
+                                const optValue = option.value || option;
+                                const optLabel = option.label || option;
+                                const isSelected = question.type === 'multiselect' 
+                                   ? (Array.isArray(value) && value.includes(optValue))
+                                   : value === optValue;
+
+                                return (
+                                  <button
+                                    key={optValue}
+                                    type="button"
+                                    onClick={() => {
+                                      if (question.type === 'multiselect') {
+                                        toggleOption(optValue);
+                                      } else {
+                                        setValue(optValue);
+                                        setError(null);
+                                        setDropdownOpen(false);
+                                        setTimeout(() => onNext(optValue), 300);
+                                      }
+                                    }}
+                                    className={cn(
+                                      "w-full text-left px-6 py-4 transition-colors flex items-center justify-between border-b border-border-primary/30 last:border-0",
+                                      isSelected ? "bg-accent-primary/10 text-accent-primary font-bold" : "text-text-primary hover:bg-text-primary/5 font-medium"
+                                    )}
+                                  >
+                                    <span className="text-lg truncate pr-4">{optLabel}</span>
+                                    {isSelected ? (
+                                      <Check className="w-5 h-5 flex-shrink-0" />
+                                    ) : (
+                                      question.type === 'multiselect' && <Plus className="w-5 h-5 opacity-0 hover:opacity-100 text-text-secondary flex-shrink-0 transition-opacity" />
+                                    )}
+                                  </button>
+                                );
+                              })
+                            )}
+                          </div>
+                        </>
                       )}
                     </motion.div>
                   )}

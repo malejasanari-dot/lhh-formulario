@@ -153,15 +153,15 @@ export const WorkExperienceCard = ({
           )}
         </div>
 
-        {/* Áreas de expertiz */}
+        {/* Área de expertiz */}
         <div className="col-span-1 md:col-span-2">
           <FormDropdown
-            label="Áreas de expertiz"
+            label="Área de expertiz"
             value={experience.areasExpertiz}
             onChange={(val) => handleFieldChange('areasExpertiz', val)}
             options={catalogs.interestingAreas || []}
-            placeholder="Selecciona una o más áreas de experticia"
-            multiselect={true}
+            placeholder="Selecciona un área de experticia"
+            multiselect={false}
             showSearch={true}
             error={errors.areasExpertiz}
           />

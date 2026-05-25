@@ -12,7 +12,7 @@ const createEmptyExperience = () => ({
   nivelLaboral: '',
   cargo: '',
   funcionPrincipal: '',
-  areasExpertiz: [],
+  areasExpertiz: '',
   motivoRetiro: '',
   antiguedad: '',
   ultimoSalario: '',
@@ -26,7 +26,7 @@ const validateExperience = (exp) => {
   if (!exp.cargo || !exp.cargo.trim()) errors.cargo = 'El cargo es obligatorio';
   if (!exp.nivelLaboral) errors.nivelLaboral = 'El nivel laboral es obligatorio';
   if (!exp.funcionPrincipal || !exp.funcionPrincipal.trim()) errors.funcionPrincipal = 'La función es obligatoria';
-  if (!exp.areasExpertiz || exp.areasExpertiz.length === 0) errors.areasExpertiz = 'Selecciona al menos una área';
+  if (!exp.areasExpertiz) errors.areasExpertiz = 'Selecciona un área';
   if (!exp.motivoRetiro) errors.motivoRetiro = 'El motivo de retiro es obligatorio';
   if (!exp.antiguedad) errors.antiguedad = 'La antigüedad es obligatoria';
   if (!exp.ultimoSalario || !exp.ultimoSalario.trim()) errors.ultimoSalario = 'El salario es obligatorio';

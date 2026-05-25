@@ -170,6 +170,17 @@ export const QUESTIONS = [
     options: []
   },
   {
+    id: 'idioma_nativo',
+    phaseId: 'academic',
+    question: 'Idioma nativo',
+    description: 'Selecciona tu idioma nativo.',
+    type: 'select',
+    variant: 'compact',
+    required: true,
+    isDynamic: true,
+    options: [], // Se cargará dinámicamente desde el backend 
+  },
+  {
     id: 'idiomas',
     phaseId: 'academic',
     question: 'Idiomas',
@@ -180,17 +191,6 @@ export const QUESTIONS = [
     isDynamic: true,
     requiresLevel: true,
     options: [], // Se cargará dinámicamente desde el backend
-  },
-  {
-    id: 'idioma_nativo',
-    phaseId: 'academic',
-    question: 'Idioma nativo',
-    description: 'Selecciona tu idioma nativo.',
-    type: 'select',
-    variant: 'compact',
-    required: true,
-    isDynamic: true,
-    options: [], // Se cargará dinámicamente desde el backend 
   },
   {
     id: 'tecnologias',

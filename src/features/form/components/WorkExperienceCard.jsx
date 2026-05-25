@@ -56,7 +56,7 @@ export const WorkExperienceCard = ({
             <Briefcase className="w-4 h-4" />
           </div>
           <span className="text-xs font-bold uppercase tracking-widest text-content-primary opacity-90">
-            {experience.empresa || 'Nueva Experiencia'}
+            {experience.empresa || 'Última experiencia'}
           </span>
         </div>
 

@@ -208,20 +208,38 @@ select.theme-select:focus-visible {
   display: flex;
 }
 
-.lhh-phone-field .lhh-phone-button.form-control {
+.lhh-phone-field .lhh-phone-container .lhh-phone-button.form-control {
   height: var(--phone-height);
   width: 84px;
   border-radius: 12px 0 0 12px;
   border: 1px solid var(--border-subtle);
   border-right: 0;
   background: var(--surface-card);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
-.lhh-phone-field .lhh-phone-button.form-control:hover {
+.lhh-phone-field .lhh-phone-container .lhh-phone-button.form-control:hover,
+.lhh-phone-field .lhh-phone-container .lhh-phone-button.form-control:focus {
   background: var(--surface-hover);
 }
 
-.lhh-phone-field .lhh-phone-input.form-control {
+.lhh-phone-field .lhh-phone-container .flag-dropdown {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.lhh-phone-field .lhh-phone-container .flag-dropdown.open .selected-flag,
+.lhh-phone-field .lhh-phone-container .selected-flag:hover,
+.lhh-phone-field .lhh-phone-container .selected-flag:focus {
+  background-color: var(--surface-hover) !important;
+  border-radius: 12px 0 0 12px;
+}
+
+.lhh-phone-field .lhh-phone-container .selected-flag {
+  background-color: transparent !important;
+}
+
+.lhh-phone-field .lhh-phone-container .lhh-phone-input.form-control {
   width: 100%;
   height: var(--phone-height);
   border-radius: 0 12px 12px 0;
@@ -235,73 +253,100 @@ select.theme-select:focus-visible {
   transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
 }
 
-.lhh-phone-field .lhh-phone-input.form-control::placeholder {
+.lhh-phone-field .lhh-phone-container .lhh-phone-input.form-control::placeholder {
   color: color-mix(in srgb, var(--content-secondary) 72%, transparent);
 }
 
-.lhh-phone-field .lhh-phone-container.react-tel-input:focus-within .lhh-phone-button.form-control,
-.lhh-phone-field .lhh-phone-container.react-tel-input:focus-within .lhh-phone-input.form-control {
+.lhh-phone-field .lhh-phone-container:focus-within .lhh-phone-button.form-control,
+.lhh-phone-field .lhh-phone-container:focus-within .lhh-phone-input.form-control {
   border-color: var(--state-active-border);
   box-shadow: 0 0 0 2px var(--focus-ring);
 }
 
-.lhh-phone-field .lhh-phone-container.react-tel-input.has-error .lhh-phone-button.form-control,
-.lhh-phone-field .lhh-phone-container.react-tel-input.has-error .lhh-phone-input.form-control {
+.lhh-phone-field .lhh-phone-container.has-error .lhh-phone-button.form-control,
+.lhh-phone-field .lhh-phone-container.has-error .lhh-phone-input.form-control {
   border-color: #ef4444;
 }
 
-.lhh-phone-field .lhh-phone-dropdown.country-list {
+.lhh-phone-field .lhh-phone-container .lhh-phone-dropdown.country-list {
   margin-top: 10px;
   border-radius: 14px;
   border: 1px solid var(--border-subtle);
   background: var(--surface-dropdown);
   box-shadow: var(--shadow-premium);
   color: var(--content-primary);
+  overflow: hidden; /* Keeps rounded corners clean */
+  padding: 0;
 }
 
-.lhh-phone-field .lhh-phone-dropdown .search {
-  background: transparent;
-  padding: 10px;
+.lhh-phone-field .lhh-phone-container .lhh-phone-dropdown .search {
+  background: var(--surface-card);
+  padding: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.lhh-phone-field .lhh-phone-dropdown .search-box,
-.lhh-phone-field .lhh-phone-search {
+.lhh-phone-field .lhh-phone-container .lhh-phone-dropdown .search-box,
+.lhh-phone-field .lhh-phone-container .lhh-phone-search {
   width: 100%;
   border-radius: 10px;
   border: 1px solid var(--border-subtle);
-  background: var(--surface-card);
+  background: var(--surface-dropdown);
   color: var(--content-primary);
-  padding: 8px 10px;
+  padding: 10px 14px;
+  margin: 0;
+  font-family: var(--font-sans);
+  transition: all 0.2s ease;
 }
 
-.lhh-phone-field .lhh-phone-dropdown .search-box:focus,
-.lhh-phone-field .lhh-phone-search:focus {
+.lhh-phone-field .lhh-phone-container .lhh-phone-dropdown .search-box::placeholder,
+.lhh-phone-field .lhh-phone-container .lhh-phone-search::placeholder {
+  color: var(--content-secondary);
+  opacity: 0.6;
+}
+
+.lhh-phone-field .lhh-phone-container .lhh-phone-dropdown .search-box:focus,
+.lhh-phone-field .lhh-phone-container .lhh-phone-search:focus {
   border-color: var(--state-active-border);
   outline: none;
   box-shadow: 0 0 0 2px var(--focus-ring);
+  background: var(--surface-app);
 }
 
-.lhh-phone-field .lhh-phone-dropdown .country {
+.lhh-phone-field .lhh-phone-container .lhh-phone-dropdown .country {
   color: var(--content-primary);
-  transition: background-color 0.2s ease;
+  background-color: var(--surface-dropdown);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-.lhh-phone-field .lhh-phone-dropdown .country .dial-code {
+.lhh-phone-field .lhh-phone-container .lhh-phone-dropdown .country:last-child {
+  border-bottom: none;
+}
+
+.lhh-phone-field .lhh-phone-container .lhh-phone-dropdown .country .dial-code {
   color: var(--content-secondary);
 }
 
-.lhh-phone-field .lhh-phone-dropdown .country:hover,
-.lhh-phone-field .lhh-phone-dropdown .country.highlight,
-.lhh-phone-field .lhh-phone-dropdown .country.active {
-  background: var(--state-active-bg);
+.lhh-phone-field .lhh-phone-container .lhh-phone-dropdown .country:hover,
+.lhh-phone-field .lhh-phone-container .lhh-phone-dropdown .country.highlight {
+  background-color: var(--surface-hover);
 }
 
-.lhh-phone-field .lhh-phone-dropdown .country.active .dial-code,
-.lhh-phone-field .lhh-phone-dropdown .country.highlight .dial-code {
+.lhh-phone-field .lhh-phone-container .lhh-phone-dropdown .country.active {
+  background-color: var(--state-active-bg);
+}
+
+.lhh-phone-field .lhh-phone-container .lhh-phone-dropdown .country.active .dial-code,
+.lhh-phone-field .lhh-phone-container .lhh-phone-dropdown .country.highlight .dial-code {
   color: var(--state-active-text);
 }
 
-.lhh-phone-field .lhh-phone-dropdown .country.active .country-name,
-.lhh-phone-field .lhh-phone-dropdown .country.highlight .country-name {
+.lhh-phone-field .lhh-phone-container .lhh-phone-dropdown .country.active .country-name,
+.lhh-phone-field .lhh-phone-container .lhh-phone-dropdown .country.highlight .country-name {
   color: var(--state-active-text);
+  font-weight: 600;
 }

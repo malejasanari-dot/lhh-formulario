@@ -7,8 +7,10 @@ export const WorkExperienceSummary = ({
   experience,
   onExpand,
   onRemove,
-  index
+  index,
+  catalogs = {}
 }) => {
+  const empresaLabel = catalogs?.companies?.find(e => e.value === experience.empresa)?.label || experience.empresa || 'Empresa sin nombre';
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
@@ -28,7 +30,7 @@ export const WorkExperienceSummary = ({
 
         <div className="flex flex-col">
           <span className="text-sm font-bold text-content-primary">
-            {experience.empresa || 'Empresa sin nombre'}
+            {empresaLabel}
           </span>
           <span className="text-xs text-content-secondary font-medium">
             {experience.cargo || 'Cargo sin especificar'} • {experience.nivelLaboral || 'Nivel sin especificar'}

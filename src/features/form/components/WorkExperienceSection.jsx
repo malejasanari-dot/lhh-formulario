@@ -22,7 +22,7 @@ const createEmptyExperience = () => ({
 
 const validateExperience = (exp) => {
   const errors = {};
-  if (!exp.empresa || !exp.empresa.trim()) errors.empresa = 'La empresa es obligatoria';
+  if (exp.empresa === '' || exp.empresa == null) errors.empresa = 'La empresa es obligatoria';
   if (!exp.cargo || !exp.cargo.trim()) errors.cargo = 'El cargo es obligatorio';
   if (!exp.nivelLaboral) errors.nivelLaboral = 'El nivel laboral es obligatorio';
   if (!exp.funcionPrincipal || !exp.funcionPrincipal.trim()) errors.funcionPrincipal = 'La función es obligatoria';
@@ -219,6 +219,7 @@ export const WorkExperienceSection = ({
                       index={idx}
                       onExpand={() => handleExpandExperience(idx)}
                       onRemove={() => handleRemoveExperience(idx)}
+                      catalogs={catalogs}
                     />
                   );
                 })}

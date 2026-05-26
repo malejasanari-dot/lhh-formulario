@@ -12,19 +12,25 @@ export const PackageItemsSelector = ({
   // Ensure value is an array
   const items = Array.isArray(value) ? value : [];
 
-  // Filter out options that are already selected
+  // Filter out options that are already selected (numeric comparison)
   const availableOptions = options.filter(
-    (opt) => !items.some((item) => item.id === opt.value)
+    (opt) => !items.some((item) => item.id === Number(opt.value))
   );
 
   const handleSelect = (selectedId) => {
     if (!selectedId) return;
-    const option = options.find((opt) => opt.value === selectedId);
+
+    const option = options.find(
+      (opt) => Number(opt.value) === Number(selectedId)
+    );
+
+    console.log('OPTION SELECTED', option);
+
     if (option) {
       onChange([
         ...items,
         {
-          id: option.value,
+          id: Number(option.value),
           label: option.label,
           unitType: option.unitType,
           quantity: ''

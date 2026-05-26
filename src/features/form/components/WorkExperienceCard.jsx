@@ -57,7 +57,7 @@ export const WorkExperienceCard = ({
             <Briefcase className="w-4 h-4" />
           </div>
           <span className="text-xs font-bold uppercase tracking-widest text-content-primary opacity-90">
-            {catalogs?.empresas?.find(e => e.value === experience.empresa)?.label || experience.empresa || 'Última experiencia'}
+            {catalogs?.companies?.find(e => e.value === experience.empresa)?.label || experience.empresa || 'Última experiencia'}
           </span>
         </div>
 
@@ -79,7 +79,7 @@ export const WorkExperienceCard = ({
           label="Empresa"
           value={experience.empresa}
           onChange={(val) => handleFieldChange('empresa', val)}
-          options={catalogs?.empresas || []}
+          options={catalogs?.companies || []}
           placeholder="Busca y selecciona la empresa..."
           showSearch={true}
           error={errors.empresa}

@@ -57,7 +57,9 @@ const FormContainer = () => {
           const catalogKey =
             q.id === 'idioma_nativo'
               ? 'idiomas'
-              : q.id;
+              : q.id === 'empresa'
+                ? 'companies'
+                : q.id;
           if (catalogs[catalogKey]) {
             return {
               ...q,

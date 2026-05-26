@@ -171,7 +171,7 @@ export const catalogService = {
    */
   getEmpresas: async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/empresas`);
+      const response = await fetch(`${API_BASE_URL}/companies`);
       if (!response.ok) {
         throw new Error(`Error HTTP: ${response.status}`);
       }

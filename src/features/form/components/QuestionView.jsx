@@ -14,7 +14,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
   const [dropdownSearchTerm, setDropdownSearchTerm] = useState('');
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
-  
+
   const isCompact = question.variant === 'compact';
   const maxVisible = isCompact ? 9 : 6;
   const isDropdown = question.variant === 'dropdown' || (question.options?.length > 6);
@@ -58,7 +58,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
         return;
       }
     }
-    
+
     let finalValue = value;
     if (question.requiresLevel && Array.isArray(value) && value.length > 0) {
       finalValue = value.map(v => ({
@@ -153,7 +153,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                 <AnimatePresence>
                   {value.map((v) => {
                     const opt = question.options?.find(o => (o.value || o) === v);
-                    
+
                     if (question.requiresLevel) {
                       return (
                         <motion.div
@@ -168,7 +168,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                             <button onClick={() => {
                               toggleOption(v);
                               setLevels(prev => {
-                                const newLevels = {...prev};
+                                const newLevels = { ...prev };
                                 delete newLevels[v];
                                 return newLevels;
                               });
@@ -177,22 +177,22 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                             </button>
                           </div>
                           <div className="flex items-center gap-2 bg-surface-card rounded-xl p-2 border border-border-subtle shadow-inner shadow-[var(--shadow-soft-card)]">
-                             <span className="text-[10px] font-bold text-content-secondary uppercase tracking-widest pl-2">Nivel:</span>
-                             <div className="relative flex-1">
-                               <select
-                                 value={levels[v] || 'Básico'}
-                                 onChange={(e) => setLevels(prev => ({ ...prev, [v]: e.target.value }))}
-                                 className="theme-select w-full rounded-lg bg-surface-dropdown px-2 py-1 text-sm font-medium text-content-primary border border-transparent hover:border-border-strong focus:outline-none focus:border-state-active-border focus:ring-2 focus:ring-focus-ring cursor-pointer appearance-none pr-7 transition-all duration-300"
-                               >
-                                  <option className="theme-select-option" value="Básico">Básico</option>
-                                  <option className="theme-select-option" value="Intermedio">Intermedio</option>
-                                  <option className="theme-select-option" value="Alto">Alto</option>
-                                  <option className="theme-select-option" value="Avanzado">Avanzado</option>
-                               </select>
-                               <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-content-secondary">
-                                 <ChevronRight className="w-4 h-4 rotate-90" />
-                               </div>
-                             </div>
+                            <span className="text-[10px] font-bold text-content-secondary uppercase tracking-widest pl-2">Nivel:</span>
+                            <div className="relative flex-1">
+                              <select
+                                value={levels[v] || 'Básico'}
+                                onChange={(e) => setLevels(prev => ({ ...prev, [v]: e.target.value }))}
+                                className="theme-select w-full rounded-lg bg-surface-dropdown px-2 py-1 text-sm font-medium text-content-primary border border-transparent hover:border-border-strong focus:outline-none focus:border-state-active-border focus:ring-2 focus:ring-focus-ring cursor-pointer appearance-none pr-7 transition-all duration-300"
+                              >
+                                <option className="theme-select-option" value="Básico">Básico</option>
+                                <option className="theme-select-option" value="Intermedio">Intermedio</option>
+                                <option className="theme-select-option" value="Alto">Alto</option>
+                                <option className="theme-select-option" value="Avanzado">Avanzado</option>
+                              </select>
+                              <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-content-secondary">
+                                <ChevronRight className="w-4 h-4 rotate-90" />
+                              </div>
+                            </div>
                           </div>
                         </motion.div>
                       );
@@ -230,9 +230,9 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                 >
                   <span className="truncate pr-4">
                     {isLoading ? 'Cargando opciones...' : isError ? 'Error al cargar opciones' :
-                     question.type === 'multiselect' 
-                       ? (value.length > 0 ? 'Seleccionar más opciones...' : 'Selecciona una opción...')
-                       : (value ? (question.options?.find(o => (o.value || o) === value)?.label || value) : 'Selecciona una opción...')}
+                      question.type === 'multiselect'
+                        ? (value.length > 0 ? 'Seleccionar más opciones...' : 'Selecciona una opción...')
+                        : (value ? (question.options?.find(o => (o.value || o) === value)?.label || value) : 'Selecciona una opción...')}
                   </span>
                   <div className="pointer-events-none text-content-secondary transition-transform duration-300 group-focus-within:text-action-primary flex-shrink-0">
                     <ChevronRight className={cn("w-8 h-8 transition-transform duration-300", dropdownOpen ? "-rotate-90" : "rotate-90")} />
@@ -255,7 +255,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                         <div className="p-6 text-text-secondary animate-pulse font-medium">Cargando opciones...</div>
                       ) : isError ? (
                         <div className="p-6 text-red-500 flex items-center gap-3 font-medium">
-                           <AlertCircle className="w-5 h-5"/> Error al cargar opciones
+                          <AlertCircle className="w-5 h-5" /> Error al cargar opciones
                         </div>
                       ) : !question.options || question.options.length === 0 ? (
                         <div className="p-6 text-text-secondary font-medium">No hay opciones disponibles</div>
@@ -279,16 +279,16 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                             {filteredDropdownOptions.length === 0 ? (
                               <div className="p-6 text-text-secondary font-medium">No hay opciones disponibles</div>
                             ) : (
-                              filteredDropdownOptions.map((option) => {
+                              filteredDropdownOptions.map((option, idx) => {
                                 const optValue = option.value || option;
                                 const optLabel = option.label || option;
-                                const isSelected = question.type === 'multiselect' 
-                                   ? (Array.isArray(value) && value.includes(optValue))
-                                   : value === optValue;
+                                const isSelected = question.type === 'multiselect'
+                                  ? (Array.isArray(value) && value.includes(optValue))
+                                  : value === optValue;
 
                                 return (
                                   <button
-                                    key={optValue}
+                                    key={`${optValue}-${idx}`}
                                     type="button"
                                     onClick={() => {
                                       if (question.type === 'multiselect') {
@@ -377,7 +377,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                         return (
                           <motion.button
                             layout
-                            key={optionValue}
+                            key={`${optionValue}-${idx}`}
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}

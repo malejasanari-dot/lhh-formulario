@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Save, Trash2, Calendar, DollarSign, Briefcase } from 'lucide-react';
 import { FormDropdown } from './FormDropdown';
+import { PackageItemsSelector } from './PackageItemsSelector';
 import { cn } from '../../../utils/cn';
 
 // Dropdown options constants
@@ -220,14 +221,14 @@ export const WorkExperienceCard = ({
         />
 
         {/* Paquete de desvinculación */}
-        <FormDropdown
-          label="Paquete de desvinculación"
-          value={experience.paqueteDesvinculacion}
-          onChange={(val) => handleFieldChange('paqueteDesvinculacion', val)}
-          options={catalogs.packageItems || []}
-          placeholder="¿Recibiste paquete de salida?"
-          error={errors.paqueteDesvinculacion}
-        />
+        <div className="col-span-1 md:col-span-2">
+          <PackageItemsSelector
+            value={experience.paqueteDesvinculacion}
+            onChange={(val) => handleFieldChange('paqueteDesvinculacion', val)}
+            options={catalogs.packageItems || []}
+            error={errors.paqueteDesvinculacion}
+          />
+        </div>
       </div>
     </motion.div>
   );

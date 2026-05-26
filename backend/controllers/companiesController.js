@@ -1,6 +1,6 @@
 const pool = require('../db/connection');
 
-const getEmpresas = async (req, res) => {
+const getCompanies = async (req, res) => {
     try {
         const [rows] = await pool.query(`
       SELECT id, name
@@ -8,12 +8,12 @@ const getEmpresas = async (req, res) => {
       ORDER BY name ASC
     `);
 
-        const empresas = rows.map((item) => ({
+        const companies = rows.map((item) => ({
             label: item.name,
             value: item.id
         }));
 
-        res.json(empresas);
+        res.json(companies);
 
     } catch (error) {
         console.error('Error obteniendo empresas:', error);
@@ -25,5 +25,5 @@ const getEmpresas = async (req, res) => {
 };
 
 module.exports = {
-    getEmpresas
+    getCompanies
 };

@@ -17,7 +17,7 @@ const createEmptyExperience = () => ({
   antiguedad: '',
   ultimoSalario: '',
   fechaRetiro: '',
-  paqueteDesvinculacion: ''
+  paqueteDesvinculacion: []
 });
 
 const validateExperience = (exp) => {
@@ -31,7 +31,7 @@ const validateExperience = (exp) => {
   if (!exp.antiguedad) errors.antiguedad = 'La antigüedad es obligatoria';
   if (!exp.ultimoSalario || !exp.ultimoSalario.trim()) errors.ultimoSalario = 'El salario es obligatorio';
   if (!exp.fechaRetiro) errors.fechaRetiro = 'La fecha de retiro es obligatoria';
-  if (!exp.paqueteDesvinculacion) errors.paqueteDesvinculacion = 'Este campo es obligatorio';
+  if (!exp.paqueteDesvinculacion || exp.paqueteDesvinculacion.length === 0) errors.paqueteDesvinculacion = 'Este campo es obligatorio';
   return errors;
 };
 

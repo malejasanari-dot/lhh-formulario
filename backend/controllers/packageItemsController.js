@@ -8,13 +8,19 @@ const getPackageItems = async (req, res) => {
         const [rows] = await pool.query(`
       SELECT id, name
       FROM package_items
+      WHERE id != 3
       ORDER BY name ASC
     `);
 
-        const packageItems = rows.map((item) => ({
-            label: item.name,
-            value: item.name
-        }));
+        const packageItems = rows.map((item) => {
+            const unitsItems = [6, 7, 9];
+            const type = unitsItems.includes(Number(item.id)) ? 'UNIDADES' : 'MESES';
+            return {
+                label: item.name,
+                value: item.id,
+                unitType: type
+            };
+        });
 
         res.json(packageItems);
 

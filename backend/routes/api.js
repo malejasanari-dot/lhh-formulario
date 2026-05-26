@@ -1,5 +1,6 @@
 const { getCiudades } = require('../controllers/ciudadesController');
 const { getEducationLevels } = require('../controllers/educationLevelsController');
+const { getEmpresas } = require('../controllers/empresasController');
 const express = require('express');
 const router = express.Router();
 const healthController = require('../controllers/healthController');
@@ -47,6 +48,9 @@ router.get('/motivos-retiro', getReasons);
 
 // Endpoint de paquetes de desvinculación
 router.get('/paquetes-desvinculacion', getPackageItems);
+
+// Endpoint de empresas
+router.get('/empresas', getEmpresas);
 
 // Endpoint de tecnologias
 router.get('/tecnologias', getTecnologias);

@@ -30,7 +30,8 @@ const FormContainer = () => {
     fetchLevels,
     fetchInterestingAreas,
     fetchReasons,
-    fetchPackageItems
+    fetchPackageItems,
+    fetchEmpresas
   } = useCatalogs();
   console.log('FormContainer catalogs', catalogs);
   // Cargar catálogos dinámicos
@@ -45,6 +46,7 @@ const FormContainer = () => {
     fetchInterestingAreas();
     fetchReasons();
     fetchPackageItems();
+    fetchEmpresas();
   }, []);
 
   // Sincronizar opciones dinámicas con preguntas

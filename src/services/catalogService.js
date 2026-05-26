@@ -166,4 +166,20 @@ export const catalogService = {
     }
   },
 
+  /**
+   * Obtiene la lista de empresas.
+   */
+  getEmpresas: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/empresas`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getEmpresas:', error);
+      throw error;
+    }
+  },
+
 }

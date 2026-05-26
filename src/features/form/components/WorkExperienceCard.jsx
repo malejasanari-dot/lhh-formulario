@@ -56,7 +56,7 @@ export const WorkExperienceCard = ({
             <Briefcase className="w-4 h-4" />
           </div>
           <span className="text-xs font-bold uppercase tracking-widest text-content-primary opacity-90">
-            {experience.empresa || 'Última experiencia'}
+            {catalogs?.empresas?.find(e => e.value === experience.empresa)?.label || experience.empresa || 'Última experiencia'}
           </span>
         </div>
 
@@ -74,24 +74,15 @@ export const WorkExperienceCard = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
         {/* Empresa */}
-        <div className="space-y-1">
-          <label className="block text-[11px] font-bold text-content-secondary uppercase tracking-widest pl-1">
-            Empresa
-          </label>
-          <input
-            type="text"
-            value={experience.empresa || ''}
-            onChange={(e) => handleFieldChange('empresa', e.target.value)}
-            placeholder="Ej: Bancolombia, Google..."
-            className={cn(
-              "w-full bg-surface-card border rounded-xl px-4 py-3 text-sm text-content-primary placeholder:text-content-secondary/40 focus:outline-none focus:border-border-strong focus:ring-2 focus:ring-focus-ring focus:shadow-[var(--shadow-soft-card)] transition-all duration-300",
-              errors.empresa ? "border-red-500/50" : "border-border-subtle"
-            )}
-          />
-          {errors.empresa && (
-            <span className="text-[11px] text-red-500 mt-1 block pl-1">{errors.empresa}</span>
-          )}
-        </div>
+        <FormDropdown
+          label="Empresa"
+          value={experience.empresa}
+          onChange={(val) => handleFieldChange('empresa', val)}
+          options={catalogs?.empresas || []}
+          placeholder="Busca y selecciona la empresa..."
+          showSearch={true}
+          error={errors.empresa}
+        />
 
         {/* Nivel Laboral */}
         <FormDropdown

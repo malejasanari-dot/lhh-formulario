@@ -57,7 +57,7 @@ export const useCatalogs = () => {
     fetchLevels: () => loadCatalog('levels', catalogService.getLevels),
     fetchInterestingAreas: () => loadCatalog('interestingAreas', catalogService.getInterestingAreas),
     fetchReasons: () => loadCatalog('reasons', catalogService.getReasons),
-    fetchPackageItems: () => loadCatalog('packageItems', catalogService.getPackageItems)
-
+    fetchPackageItems: () => loadCatalog('packageItems', catalogService.getPackageItems),
+    fetchEmpresas: () => loadCatalog('empresas', catalogService.getEmpresas)
   };
 };

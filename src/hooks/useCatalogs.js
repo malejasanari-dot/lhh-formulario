@@ -55,7 +55,7 @@ export const useCatalogs = () => {
     fetchProfessions: () => loadCatalog('profesiones', catalogService.getProfessions),
     fetchLanguages: () => loadCatalog('idiomas', catalogService.getLanguages),
     fetchTecnologias: () => loadCatalog('tecnologias', catalogService.getTechnologies),
-    fetchLevels: () => loadCatalog('levels', catalogService.getLevels),
+    fetchLevels: () => loadCatalog('levels', catalogService.getWorkLevels),
     fetchInterestingAreas: () => loadCatalog('interestingAreas', catalogService.getInterestingAreas),
     fetchReasons: () => loadCatalog('reasons', catalogService.getReasons),
     fetchPackageItems: () => loadCatalog('packageItems', catalogService.getPackageItems),

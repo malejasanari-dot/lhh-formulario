@@ -50,15 +50,15 @@ export const useCatalogs = () => {
     loadCatalog,
     // Atajos para catálogos específicos
     fetchEducationLevels: () => loadCatalog('nivel_educativo', catalogService.getEducationLevels),
-    fetchCiudades: () => loadCatalog('ciudad', catalogService.getCities),
-    fetchEstadosCiviles: () => loadCatalog('estado_civil', catalogService.getMaritalStatuses),
-    fetchProfesiones: () => loadCatalog('profesiones', catalogService.getProfessions),
-    fetchIdiomas: () => loadCatalog('idiomas', catalogService.getLanguages),
+    fetchCities: () => loadCatalog('ciudad', catalogService.getCities),
+    fetchMaritalStatuses: () => loadCatalog('estado_civil', catalogService.getMaritalStatuses),
+    fetchProfessions: () => loadCatalog('profesiones', catalogService.getProfessions),
+    fetchLanguages: () => loadCatalog('idiomas', catalogService.getLanguages),
     fetchTecnologias: () => loadCatalog('tecnologias', catalogService.getTechnologies),
     fetchLevels: () => loadCatalog('levels', catalogService.getLevels),
     fetchInterestingAreas: () => loadCatalog('interestingAreas', catalogService.getInterestingAreas),
     fetchReasons: () => loadCatalog('reasons', catalogService.getReasons),
     fetchPackageItems: () => loadCatalog('packageItems', catalogService.getPackageItems),
-    fetchEmpresas: () => loadCatalog('companies', catalogService.getEmpresas)
+    fetchCompanies: () => loadCatalog('companies', catalogService.getCompanies)
   };
 };

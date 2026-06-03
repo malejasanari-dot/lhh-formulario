@@ -22,31 +22,31 @@ const FormContainer = () => {
     loading,
     errors,
     fetchEducationLevels,
-    fetchCiudades,
-    fetchEstadosCiviles,
-    fetchProfesiones,
-    fetchIdiomas,
+    fetchCities,
+    fetchMaritalStatuses,
+    fetchProfessions,
+    fetchLanguages,
     fetchTecnologias,
     fetchLevels,
     fetchInterestingAreas,
     fetchReasons,
     fetchPackageItems,
-    fetchEmpresas
+    fetchCompanies
   } = useCatalogs();
   console.log('FormContainer catalogs', catalogs);
   // Cargar catálogos dinámicos
   useEffect(() => {
-    fetchCiudades();
+    fetchCities();
     fetchEducationLevels();
-    fetchEstadosCiviles();
-    fetchProfesiones();
-    fetchIdiomas();
+    fetchMaritalStatuses();
+    fetchProfessions();
+    fetchLanguages();
     fetchTecnologias();
     fetchLevels();
     fetchInterestingAreas();
     fetchReasons();
     fetchPackageItems();
-    fetchEmpresas();
+    fetchCompanies();
   }, []);
 
   // Sincronizar opciones dinámicas con preguntas
@@ -184,11 +184,11 @@ const FormContainer = () => {
                   }
 
                   if (currentQuestion?.id === 'ciudad') {
-                    fetchCiudades();
+                    fetchCities();
                   }
 
                   if (currentQuestion?.id === 'profesiones') {
-                    fetchProfesiones();
+                    fetchProfessions();
                   }
                 }}
               />

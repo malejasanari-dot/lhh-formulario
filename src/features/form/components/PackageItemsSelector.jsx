@@ -18,16 +18,20 @@ export const PackageItemsSelector = ({
   );
 
   const handleSelect = (selectedId) => {
-    if (!selectedId) return;
+    console.log('PackageItems options:', options);
+    console.log('selectedId:', selectedId, '| type:', typeof selectedId);
+
+    // Guard: reject null, undefined, and empty string — but allow numeric 0
+    if (selectedId === null || selectedId === undefined || selectedId === '') return;
 
     const option = options.find(
       (opt) => Number(opt.value) === Number(selectedId)
     );
 
-    console.log('OPTION SELECTED', option);
+    console.log('option encontrada:', option);
 
     if (option) {
-      onChange([
+      const updatedItems = [
         ...items,
         {
           id: Number(option.value),
@@ -35,7 +39,11 @@ export const PackageItemsSelector = ({
           unitType: option.unitType,
           quantity: ''
         }
-      ]);
+      ];
+      console.log('items actualizados:', updatedItems);
+      onChange(updatedItems);
+    } else {
+      console.warn('PackageItemsSelector: no se encontró option para selectedId:', selectedId);
     }
   };
 

@@ -28,8 +28,8 @@ export const useCatalogs = () => {
       // Formatear los datos si es necesario (label, value)
       const formattedData = data.map(item => ({
         ...item,
-        label: item.label || item.name || item,
-        value: item.value || item.name || item
+        label: item.label ?? item.name ?? item,
+        value: item.value ?? item.id ?? item.name ?? item
       }));
 
       setCatalogs(prev => ({ ...prev, [catalogId]: formattedData }));

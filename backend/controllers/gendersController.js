@@ -1,35 +1,31 @@
 const pool = require('../db/connection');
 
-const getInterestingAreas = async (req, res) => {
+const getGenders = async (req, res) => {
     try {
-
         const [rows] = await pool.query(`
       SELECT id, name
-      FROM interesting_areas
+      FROM genders
       ORDER BY name ASC
     `);
 
-        const areas = rows.map((item) => ({
+        const genders = rows.map((item) => ({
             id: item.id,
             name: item.name,
             label: item.name,
             value: item.id
         }));
 
-        res.json(areas);
+        res.json(genders);
 
     } catch (error) {
-
-        console.error('Error obteniendo áreas de expertiz:', error);
-
+        console.error('Error obteniendo géneros:', error);
         res.status(500).json({
             status: 'error',
-            message: 'Error obteniendo áreas de expertiz'
+            message: 'Error obteniendo géneros'
         });
-
     }
 };
 
 module.exports = {
-    getInterestingAreas
+    getGenders
 };

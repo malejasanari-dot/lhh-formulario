@@ -15,8 +15,10 @@ const getMaritalStatuses = async (req, res) => {
     // aunque la idea es que existan en la DB.
     const statuses = rows.length > 0 
       ? rows.map((status) => ({
+          id: status.id,
+          name: status.name,
           label: status.name,
-          value: status.name
+          value: status.id
         }))
       : [
           { label: 'Soltero(a)', value: 'soltero' },

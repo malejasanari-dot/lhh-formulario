@@ -10,8 +10,10 @@ const getLevels = async (req, res) => {
     `);
 
         const levels = rows.map((item) => ({
+            id: item.id,
+            name: item.name,
             label: item.name,
-            value: item.name
+            value: item.id
         }));
 
         res.json(levels);

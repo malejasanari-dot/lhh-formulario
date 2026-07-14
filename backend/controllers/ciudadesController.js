@@ -30,8 +30,10 @@ const getCiudades = async (req, res) => {
     `);
 
     const ciudades = rows.map((city) => ({
+      id: city.id,
+      name: city.name,
       label: city.name,
-      value: city.name
+      value: city.id
     }));
 
     res.json(ciudades);

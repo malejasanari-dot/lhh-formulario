@@ -28,8 +28,8 @@ export const useCatalogs = () => {
       // Formatear los datos si es necesario (label, value)
       const formattedData = data.map(item => ({
         ...item,
-        label: item.label || item.name || item,
-        value: item.value || item.name || item
+        label: item.label ?? item.name ?? item,
+        value: item.value ?? item.id ?? item.name ?? item
       }));
 
       setCatalogs(prev => ({ ...prev, [catalogId]: formattedData }));
@@ -54,11 +54,17 @@ export const useCatalogs = () => {
     fetchEstadosCiviles: () => loadCatalog('estado_civil', catalogService.getMaritalStatuses),
     fetchProfesiones: () => loadCatalog('profesiones', catalogService.getProfesiones),
     fetchIdiomas: () => loadCatalog('idiomas', catalogService.getIdiomas),
+    fetchLanguageLevels: () => loadCatalog('languageLevels', catalogService.getLanguageLevels),
     fetchTecnologias: () => loadCatalog('tecnologias', catalogService.getTecnologias),
     fetchLevels: () => loadCatalog('levels', catalogService.getLevels),
     fetchInterestingAreas: () => loadCatalog('interestingAreas', catalogService.getInterestingAreas),
     fetchReasons: () => loadCatalog('reasons', catalogService.getReasons),
     fetchPackageItems: () => loadCatalog('packageItems', catalogService.getPackageItems),
-    fetchEmpresas: () => loadCatalog('companies', catalogService.getEmpresas)
+    fetchEmpresas: () => loadCatalog('companies', catalogService.getEmpresas),
+    fetchEconomicSectors: () => loadCatalog('economicSectors', catalogService.getEconomicSectors),
+    fetchOffices: () => loadCatalog('offices', catalogService.getOffices),
+    fetchIdTypes: () => loadCatalog('idTypes', catalogService.getIdTypes),
+    fetchGenders: () => loadCatalog('genders', catalogService.getGenders),
+    fetchSalarialRanges: () => loadCatalog('salarial_ranges', catalogService.getSalarialRanges)
   };
 };

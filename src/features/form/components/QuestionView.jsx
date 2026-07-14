@@ -5,7 +5,7 @@ import { cn } from '../../../utils/cn';
 import { DatePicker } from '../../../components/ui/DatePicker';
 import { InternationalPhoneField } from '../../../components/ui/InternationalPhoneField';
 
-const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, isError, onRetry }) => {
+const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, isError, onRetry, catalogs }) => {
   const [value, setValue] = useState(question.type === 'multiselect' ? [] : '');
   const [levels, setLevels] = useState({});
   const [error, setError] = useState(null);
@@ -15,10 +15,49 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
 
+  const [isDragging, setIsDragging] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState('');
+
   const isCompact = question.variant === 'compact';
   const maxVisible = isCompact ? 9 : 6;
   const isDropdown = question.variant === 'dropdown' || (question.options?.length > 6);
   const shouldShowDropdownSearch = (question.options?.length || 0) > 6;
+
+  // Manejar creación y revocación de URL de previsualización para la foto
+  useEffect(() => {
+    if (question.type === 'upload' && value instanceof File) {
+      const url = URL.createObjectURL(value);
+      setPreviewUrl(url);
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    } else {
+      setPreviewUrl('');
+    }
+  }, [value, question.type]);
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files?.[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith('image/')) {
+        setValue(file);
+        setError(null);
+      } else {
+        setError('Por favor selecciona un archivo de imagen válido.');
+      }
+    }
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -53,7 +92,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
         setError('Por favor selecciona al menos una opción');
         return;
       }
-      if (question.type !== 'multiselect' && (!value || !value.toString().trim())) {
+      if (question.type !== 'multiselect' && (value === '' || value === null || value === undefined || !value.toString().trim())) {
         setError('Este campo es obligatorio');
         return;
       }
@@ -63,7 +102,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
     if (question.requiresLevel && Array.isArray(value) && value.length > 0) {
       finalValue = value.map(v => ({
         language: v,
-        level: levels[v] || 'Básico'
+        level: levels[v] || catalogs?.languageLevels?.[0]?.value
       }));
     }
     onNext(finalValue);
@@ -93,7 +132,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
 
   const isValueValid = question.type === 'multiselect'
     ? (!question.required || (Array.isArray(value) && value.length > 0))
-    : (!question.required || (value && value.toString().trim().length > 0));
+    : (!question.required || (value !== '' && value !== null && value !== undefined));
 
   const visibleOptions = showAllOptions ? question.options : question.options?.slice(0, maxVisible);
   const hasMoreOptions = question.options?.length > maxVisible;
@@ -152,7 +191,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
               <div className={cn("flex flex-wrap mb-6", question.requiresLevel ? "gap-4" : "gap-2")}>
                 <AnimatePresence>
                   {value.map((v) => {
-                    const opt = question.options?.find(o => (o.value || o) === v);
+                    const opt = question.options?.find(o => (o.value !== undefined ? o.value : o) === v);
 
                     if (question.requiresLevel) {
                       return (
@@ -180,14 +219,15 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                             <span className="text-[10px] font-bold text-content-secondary uppercase tracking-widest pl-2">Nivel:</span>
                             <div className="relative flex-1">
                               <select
-                                value={levels[v] || 'Básico'}
-                                onChange={(e) => setLevels(prev => ({ ...prev, [v]: e.target.value }))}
+                                value={levels[v] || catalogs?.languageLevels?.[0]?.value || ''}
+                                onChange={(e) => setLevels(prev => ({ ...prev, [v]: Number(e.target.value) }))}
                                 className="theme-select w-full rounded-lg bg-surface-dropdown px-2 py-1 text-sm font-medium text-content-primary border border-transparent hover:border-border-strong focus:outline-none focus:border-state-active-border focus:ring-2 focus:ring-focus-ring cursor-pointer appearance-none pr-7 transition-all duration-300"
                               >
-                                <option className="theme-select-option" value="Básico">Básico</option>
-                                <option className="theme-select-option" value="Intermedio">Intermedio</option>
-                                <option className="theme-select-option" value="Alto">Alto</option>
-                                <option className="theme-select-option" value="Avanzado">Avanzado</option>
+                                {catalogs?.languageLevels?.map(level => (
+                                  <option key={level.value} className="theme-select-option" value={level.value}>
+                                    {level.label}
+                                  </option>
+                                ))}
                               </select>
                               <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-content-secondary">
                                 <ChevronRight className="w-4 h-4 rotate-90" />
@@ -225,14 +265,14 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                   className={cn(
                     "w-full bg-transparent border-b-2 py-6 flex items-center justify-between text-2xl md:text-4xl text-left focus:outline-none transition-colors duration-500 font-light cursor-pointer",
                     error ? "border-red-500" : "border-border-primary",
-                    (!value || value.length === 0) ? "text-text-primary/40" : "text-text-primary"
+                    (value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)) ? "text-text-primary/40" : "text-text-primary"
                   )}
                 >
                   <span className="truncate pr-4">
                     {isLoading ? 'Cargando opciones...' : isError ? 'Error al cargar opciones' :
                       question.type === 'multiselect'
                         ? (value.length > 0 ? 'Seleccionar más opciones...' : 'Selecciona una opción...')
-                        : (value ? (question.options?.find(o => (o.value || o) === value)?.label || value) : 'Selecciona una opción...')}
+                        : ((value !== undefined && value !== null && value !== '') ? (question.options?.find(o => (o.value !== undefined ? o.value : o) === value)?.label || value) : 'Selecciona una opción...')}
                   </span>
                   <div className="pointer-events-none text-content-secondary transition-transform duration-300 group-focus-within:text-action-primary flex-shrink-0">
                     <ChevronRight className={cn("w-8 h-8 transition-transform duration-300", dropdownOpen ? "-rotate-90" : "rotate-90")} />
@@ -280,7 +320,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                               <div className="p-6 text-text-secondary font-medium">No hay opciones disponibles</div>
                             ) : (
                               filteredDropdownOptions.map((option, idx) => {
-                                const optValue = option.value || option;
+                                const optValue = option.value !== undefined ? option.value : option;
                                 const optLabel = option.label || option;
                                 const isSelected = question.type === 'multiselect'
                                   ? (Array.isArray(value) && value.includes(optValue))
@@ -368,7 +408,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                   ) : (
                     <AnimatePresence mode="popLayout">
                       {visibleOptions?.map((option, idx) => {
-                        const optionValue = option.value || option;
+                        const optionValue = option.value !== undefined ? option.value : option;
                         const optionLabel = option.label || option;
                         const isSelected = question.type === 'multiselect'
                           ? (Array.isArray(value) && value.includes(optionValue))
@@ -387,7 +427,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                               } else {
                                 setValue(optionValue);
                                 setError(null);
-                                setTimeout(onNext, 300);
+                                setTimeout(() => onNext(optionValue), 300);
                               }
                             }}
                             className={cn(
@@ -432,10 +472,17 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
           <div className="space-y-4">
             <div
               className={cn(
-                "w-full h-64 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center space-y-4 transition-all duration-500 cursor-pointer group/upload",
-                value ? "border-state-active-border bg-state-active-bg" : "border-border-subtle hover:border-border-strong hover:bg-surface-hover"
+                "w-full h-64 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center space-y-4 transition-all duration-500 cursor-pointer group/upload overflow-hidden relative",
+                isDragging
+                  ? "border-action-primary bg-state-active-bg/50 scale-[1.01]"
+                  : value
+                    ? "border-state-active-border bg-state-active-bg"
+                    : "border-border-subtle hover:border-border-strong hover:bg-surface-hover"
               )}
               onClick={() => inputRef.current?.click()}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
             >
               <input
                 ref={inputRef}
@@ -444,35 +491,61 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                 accept="image/*"
                 onChange={(e) => {
                   if (e.target.files?.[0]) {
-                    setValue(e.target.files[0].name);
+                    setValue(e.target.files[0]);
                     setError(null);
                   }
                 }}
               />
-              <div className={cn(
-                "p-5 rounded-2xl transition-all duration-500",
-                value ? "bg-action-primary text-action-primary-text scale-110" : "bg-surface-card text-content-secondary group-hover/upload:scale-110"
-              )}>
-                {value ? <Camera className="w-8 h-8" /> : <Upload className="w-8 h-8" />}
-              </div>
-              <div className="text-center">
-                <p className="text-lg font-bold text-text-primary">
-                  {value ? 'Foto seleccionada' : 'Selecciona una foto'}
-                </p>
-                <p className="text-sm text-text-secondary">
-                  {value ? value : 'o arrastra el archivo aquí'}
-                </p>
-              </div>
-              {value && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setValue('');
-                  }}
-                  className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                >
-                  Eliminar
-                </button>
+              {value && previewUrl ? (
+                <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center p-4">
+                  <img
+                    src={previewUrl}
+                    alt="Vista previa fondo"
+                    className="absolute inset-0 w-full h-full object-cover opacity-20 blur-sm pointer-events-none"
+                  />
+                  <div className="relative z-10 flex flex-col items-center space-y-3 bg-surface-card/90 backdrop-blur-md p-5 rounded-2xl border border-border-subtle shadow-lg max-w-[90%] transition-transform duration-300 hover:scale-[1.02]">
+                    <img
+                      src={previewUrl}
+                      alt="Avatar Vista Previa"
+                      className="w-20 h-20 rounded-full object-cover border-2 border-action-primary shadow-md"
+                    />
+                    <div className="text-center">
+                      <p className="text-sm font-bold text-content-primary truncate max-w-[220px]">
+                        {value.name}
+                      </p>
+                      <p className="text-xs text-content-secondary">
+                        {(value.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setValue('');
+                      }}
+                      className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                    >
+                      Eliminar foto
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className={cn(
+                    "p-5 rounded-2xl transition-all duration-500 bg-surface-card text-content-secondary group-hover/upload:scale-110",
+                    isDragging && "scale-110 text-action-primary bg-state-active-bg"
+                  )}>
+                    <Upload className="w-8 h-8" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-lg font-bold text-text-primary">
+                      {isDragging ? '¡Suelta la foto aquí!' : 'Selecciona una foto'}
+                    </p>
+                    <p className="text-sm text-text-secondary">
+                      o arrastra el archivo aquí
+                    </p>
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -566,7 +639,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
               : "bg-gradient-to-r from-lhh-primary-magenta to-lhh-accent-pink text-action-primary-text hover:shadow-[var(--shadow-magenta-glow)] shadow-action-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           )}
         >
-          {isLast ? 'Finalizar' : 'Continuar'}
+          {isLast ? 'Enviar' : 'Continuar'}
           <ChevronRight className={cn("w-5 h-5 transition-transform", isValueValid && "group-hover:translate-x-1")} />
         </button>
 

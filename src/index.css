@@ -350,3 +350,10 @@ select.theme-select:focus-visible {
   color: var(--state-active-text);
   font-weight: 600;
 }
+
+.company-modal-card {
+  background-color: color-mix(in srgb, var(--surface-dropdown) 88%, transparent);
+  border-color: color-mix(in srgb, var(--content-secondary) 25%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}

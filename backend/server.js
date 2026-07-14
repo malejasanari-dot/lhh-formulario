@@ -10,11 +10,21 @@ const express = require('express');
 const cors = require('cors');
 const apiRoutes = require('./routes/api');
 
+const fs = require('fs');
+const path = require('path');
+
+// Asegurar que la carpeta de fotos existe
+const uploadDir = path.join(__dirname, 'uploads', 'photos');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const app = express();
 
 // Middlewares
 app.use(cors()); // Permitir peticiones desde otros dominios (como el frontend)
 app.use(express.json()); // Permitir el manejo de datos en formato JSON
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Servir archivos estáticos de uploads
 
 // Rutas
 app.use('/api', apiRoutes); // Prefijo para todas las rutas de la API

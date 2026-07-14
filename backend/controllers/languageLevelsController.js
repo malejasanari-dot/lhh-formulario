@@ -1,35 +1,35 @@
 const pool = require('../db/connection');
 
-const getEducationLevels = async (req, res) => {
+const getLanguageLevels = async (req, res) => {
     try {
 
         const [rows] = await pool.query(`
       SELECT id, name
-      FROM education_levels
-      ORDER BY name ASC
+      FROM language_levels
+      ORDER BY id ASC
     `);
 
-        const niveles = rows.map((level) => ({
+        const languageLevels = rows.map((level) => ({
             id: level.id,
             name: level.name,
             label: level.name,
             value: level.id
         }));
 
-        res.json(niveles);
+        res.json(languageLevels);
 
     } catch (error) {
 
-        console.error('Error obteniendo niveles educativos:', error);
+        console.error('Error obteniendo niveles de idioma:', error);
 
         res.status(500).json({
             status: 'error',
-            message: 'Error obteniendo niveles educativos'
+            message: 'Error obteniendo niveles de idioma'
         });
 
     }
 };
 
 module.exports = {
-    getEducationLevels
+    getLanguageLevels
 };

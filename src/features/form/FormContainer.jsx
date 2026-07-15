@@ -6,6 +6,7 @@ import { useCatalogs } from '../../hooks/useCatalogs';
 import WelcomeScreen from './components/WelcomeScreen';
 import QuestionView from './components/QuestionView';
 import WorkExperienceSection from './components/WorkExperienceSection';
+import EmailVerification from './components/EmailVerification';
 import { FORM_PHASES, QUESTIONS } from './constants';
 
 const FormContainer = () => {
@@ -13,8 +14,20 @@ const FormContainer = () => {
   const totalSteps = formQuestions.length + 1;
 
   const { currentStep, nextStep, prevStep, progress } = useFormStep(totalSteps);
-
+  const [formData, setFormData] = useState({});
   const [direction, setDirection] = useState(0);
+  const [isVerified, setIsVerified] = useState(false);
+
+  const handleVerified = (userData) => {
+    setFormData(prev => ({
+      ...prev,
+      userId: userData.userId,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      email: userData.email
+    }));
+    setIsVerified(true);
+  };
 
   // Hook para gestionar catálogos dinámicos
   const {
@@ -31,7 +44,13 @@ const FormContainer = () => {
     fetchInterestingAreas,
     fetchReasons,
     fetchPackageItems,
-    fetchEmpresas
+    fetchEmpresas,
+    fetchEconomicSectors,
+    fetchOffices,
+    fetchIdTypes,
+    fetchGenders,
+    fetchLanguageLevels,
+    fetchSalarialRanges
   } = useCatalogs();
   console.log('FormContainer catalogs', catalogs);
   // Cargar catálogos dinámicos
@@ -47,6 +66,12 @@ const FormContainer = () => {
     fetchReasons();
     fetchPackageItems();
     fetchEmpresas();
+    fetchEconomicSectors();
+    fetchOffices();
+    fetchIdTypes();
+    fetchGenders();
+    fetchLanguageLevels();
+    fetchSalarialRanges();
   }, []);
 
   // Sincronizar opciones dinámicas con preguntas
@@ -59,7 +84,13 @@ const FormContainer = () => {
               ? 'idiomas'
               : q.id === 'empresa'
                 ? 'companies'
-                : q.id;
+                : q.id === 'ciudad_programa'
+                  ? 'offices'
+                  : q.id === 'tipo_documento'
+                    ? 'idTypes'
+                    : q.id === 'genero'
+                      ? 'genders'
+                      : q.id;
           if (catalogs[catalogKey]) {
             return {
               ...q,
@@ -118,86 +149,180 @@ const FormContainer = () => {
     }),
   };
 
-  const handleNext = () => {
+  const handleNext = async (stepData) => {
     setDirection(1);
-    nextStep();
+
+    let updatedData = formData;
+    if (currentQuestion && stepData !== undefined) {
+      updatedData = {
+        ...formData,
+        [currentQuestion.id || 'experiencia']: stepData
+      };
+      setFormData(updatedData);
+    }
+
+    if (currentStep === totalSteps - 1) {
+
+      console.log('========== FORM DATA ==========');
+      console.log(updatedData);
+      console.log('===============================');
+
+      // Separar la foto de los datos del candidato para no enviarla por el JSON principal
+      const { foto, ...candidatosData } = updatedData;
+
+      try {
+        // 1. Enviar datos de texto/catálogos del candidato en formato JSON
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/candidatos`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(candidatosData),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error en la petición HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Formulario de candidato enviado con éxito:', data);
+
+        // 2. Si existe un archivo de fotografía, subirlo físicamente al backend
+        if (foto && foto instanceof File) {
+          const photoFormData = new FormData();
+          photoFormData.append('foto', foto);
+
+          const photoResponse = await fetch(`${import.meta.env.VITE_API_URL}/candidatos/foto`, {
+            method: 'POST',
+            body: photoFormData,
+          });
+
+          if (!photoResponse.ok) {
+            throw new Error(`Error al subir la fotografía: ${photoResponse.status}`);
+          }
+
+          const photoData = await photoResponse.json();
+          console.log('Fotografía subida y guardada físicamente:', photoData);
+        }
+
+      } catch (error) {
+        console.error('Error al enviar el formulario al backend:', error);
+      }
+
+    } else {
+      nextStep();
+    }
   };
 
   const handlePrev = () => {
-    setDirection(-1);
-    prevStep();
+      setDirection(-1);
+      prevStep();
+    };
+
+    const isWelcome = currentStep === 0;
+
+    const currentQuestionIndex = currentStep - 1;
+
+    const currentQuestion = !isWelcome
+      ? formQuestions[currentQuestionIndex]
+      : null;
+
+    const currentPhase = currentQuestion
+      ? FORM_PHASES.find(p => p.id === currentQuestion.phaseId)
+      : null;
+
+    if (!isVerified) {
+      return (
+        <FormLayout
+          progress={0}
+          currentPhase={null}
+          totalSteps={formQuestions.length}
+          currentStepIndex={-1}
+        >
+          <div className="w-full relative">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="verification"
+                variants={variants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="w-full"
+              >
+                <EmailVerification onVerified={handleVerified} />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </FormLayout>
+      );
+    }
+
+    return (
+      <FormLayout
+        progress={progress}
+        currentPhase={currentPhase}
+        totalSteps={formQuestions.length}
+        currentStepIndex={isWelcome ? -1 : currentQuestionIndex}
+      >
+        <div className="w-full relative">
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={currentStep}
+              custom={direction}
+              variants={variants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="w-full"
+            >
+              {isWelcome ? (
+                <WelcomeScreen onStart={handleNext} />
+              ) : currentQuestion?.type === 'work_experience' ? (
+                <WorkExperienceSection
+                  question={currentQuestion}
+                  onNext={handleNext}
+                  onPrev={handlePrev}
+                  isFirst={currentStep === 1}
+                  isLast={currentStep === totalSteps - 1}
+                  catalogs={catalogs}
+                />
+              ) : (
+                <QuestionView
+                  question={currentQuestion}
+                  onNext={handleNext}
+                  onPrev={handlePrev}
+                  isFirst={currentStep === 1}
+                  isLast={currentStep === totalSteps - 1}
+                  isLoading={loading[currentQuestion?.id]}
+                  isError={errors[currentQuestion?.id]}
+                  catalogs={catalogs}
+                  initialValue={
+                    currentQuestion?.id === 'nombre' 
+                      ? formData.firstName 
+                      : currentQuestion?.id === 'apellido' 
+                        ? formData.lastName 
+                        : formData[currentQuestion?.id]
+                  }
+                  onRetry={() => {
+                    if (currentQuestion?.id === 'nivel_educativo') {
+                      fetchEducationLevels();
+                    }
+
+                    if (currentQuestion?.id === 'ciudad') {
+                      fetchCiudades();
+                    }
+
+                    if (currentQuestion?.id === 'profesiones') {
+                      fetchProfesiones();
+                    }
+                  }}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </FormLayout>
+    );
   };
 
-  const isWelcome = currentStep === 0;
-
-  const currentQuestionIndex = currentStep - 1;
-
-  const currentQuestion = !isWelcome
-    ? formQuestions[currentQuestionIndex]
-    : null;
-
-  const currentPhase = currentQuestion
-    ? FORM_PHASES.find(p => p.id === currentQuestion.phaseId)
-    : null;
-
-  return (
-    <FormLayout
-      progress={progress}
-      currentPhase={currentPhase}
-      totalSteps={formQuestions.length}
-      currentStepIndex={isWelcome ? -1 : currentQuestionIndex}
-    >
-      <div className="w-full relative">
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.div
-            key={currentStep}
-            custom={direction}
-            variants={variants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="w-full"
-          >
-            {isWelcome ? (
-              <WelcomeScreen onStart={handleNext} />
-            ) : currentQuestion?.type === 'work_experience' ? (
-              <WorkExperienceSection
-                question={currentQuestion}
-                onNext={handleNext}
-                onPrev={handlePrev}
-                isFirst={currentStep === 1}
-                isLast={currentStep === totalSteps - 1}
-                catalogs={catalogs}
-              />
-            ) : (
-              <QuestionView
-                question={currentQuestion}
-                onNext={handleNext}
-                onPrev={handlePrev}
-                isFirst={currentStep === 1}
-                isLast={currentStep === totalSteps - 1}
-                isLoading={loading[currentQuestion?.id]}
-                isError={errors[currentQuestion?.id]}
-                onRetry={() => {
-                  if (currentQuestion?.id === 'nivel_educativo') {
-                    fetchEducationLevels();
-                  }
-
-                  if (currentQuestion?.id === 'ciudad') {
-                    fetchCiudades();
-                  }
-
-                  if (currentQuestion?.id === 'profesiones') {
-                    fetchProfesiones();
-                  }
-                }}
-              />
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-    </FormLayout>
-  );
-};
-
-export default FormContainer;
+  export default FormContainer;

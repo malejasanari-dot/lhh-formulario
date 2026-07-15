@@ -16,6 +16,7 @@ const createEmptyExperience = () => ({
   motivoRetiro: '',
   antiguedad: '',
   ultimoSalario: '',
+  salarial_range_id: '',
   fechaRetiro: '',
   paqueteDesvinculacion: []
 });
@@ -30,6 +31,7 @@ const validateExperience = (exp) => {
   if (!exp.motivoRetiro) errors.motivoRetiro = 'El motivo de retiro es obligatorio';
   if (!exp.antiguedad) errors.antiguedad = 'La antigüedad es obligatoria';
   if (!exp.ultimoSalario || !exp.ultimoSalario.trim()) errors.ultimoSalario = 'El salario es obligatorio';
+  if (!exp.salarial_range_id) errors.salarial_range_id = 'El rango salarial es obligatorio';
   if (!exp.fechaRetiro) errors.fechaRetiro = 'La fecha de retiro es obligatoria';
   if (!exp.paqueteDesvinculacion || exp.paqueteDesvinculacion.length === 0) errors.paqueteDesvinculacion = 'Este campo es obligatorio';
   return errors;
@@ -141,14 +143,29 @@ export const WorkExperienceSection = ({
   };
 
   const handleContinue = () => {
-    // Validate all experiences
+    // Filter out completely empty experiences (except the first one, which is mandatory)
+    const validExperiences = experiences.filter((exp, idx) => {
+      if (idx === 0) return true;
+      
+      const isEmpty = !exp.empresa && !exp.cargo && !exp.nivelLaboral && 
+                      !exp.funcionPrincipal && !exp.areasExpertiz && 
+                      !exp.motivoRetiro && !exp.antiguedad && 
+                      !exp.ultimoSalario && !exp.salarial_range_id && !exp.fechaRetiro && 
+                      (!exp.paqueteDesvinculacion || exp.paqueteDesvinculacion.length === 0);
+      
+      return !isEmpty;
+    });
+
+    // Validate valid experiences
     let hasErrors = false;
     const newErrorsList = {};
 
-    experiences.forEach((exp, idx) => {
+    validExperiences.forEach((exp) => {
       const expErrors = validateExperience(exp);
       if (Object.keys(expErrors).length > 0) {
-        newErrorsList[idx] = expErrors;
+        // Get original index to map errors correctly in the UI
+        const originalIdx = experiences.findIndex(e => e.id === exp.id);
+        newErrorsList[originalIdx] = expErrors;
         hasErrors = true;
       }
     });
@@ -165,7 +182,7 @@ export const WorkExperienceSection = ({
     }
 
     // Success! Proceed to next step
-    onNext(experiences);
+    onNext(validExperiences);
   };
 
   return (
@@ -289,7 +306,7 @@ export const WorkExperienceSection = ({
           onClick={handleContinue}
           className="flex items-center gap-2 px-10 py-5 font-bold rounded-2xl transition-all duration-300 group active:scale-95 bg-gradient-to-r from-lhh-primary-magenta to-lhh-accent-pink text-action-primary-text hover:shadow-[var(--shadow-magenta-glow)] shadow-[var(--shadow-premium)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring cursor-pointer"
         >
-          {isLast ? 'Finalizar' : 'Continuar'}
+          {isLast ? 'Enviar' : 'Continuar'}
           <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
         </button>
 

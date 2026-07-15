@@ -10,8 +10,10 @@ const getIdiomas = async (req, res) => {
     `);
 
         const idiomas = rows.map((language) => ({
+            id: language.id,
+            name: language.name,
             label: language.name,
-            value: language.name
+            value: language.id
         }));
 
         res.json(idiomas);

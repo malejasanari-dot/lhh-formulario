@@ -28,11 +28,8 @@ export const QUESTIONS = [
     question: 'Selecciona tu tipo de documento',
     type: 'select',
     required: true,
-    options: [
-      { label: 'Cédula de ciudadanía', value: 'CC' },
-      { label: 'Cédula de extranjería', value: 'CE' },
-      { label: 'Pasaporte', value: 'PA' },
-    ],
+    isDynamic: true,
+    options: [],
   },
   {
     id: 'numero_documento',
@@ -56,11 +53,8 @@ export const QUESTIONS = [
     question: '¿Cuál es tu género?',
     type: 'select',
     required: true,
-    options: [
-      { label: 'Femenino', value: 'femenino' },
-      { label: 'Masculino', value: 'masculino' },
-      { label: 'No Binario', value: 'no_binario' },
-    ],
+    isDynamic: true,
+    options: [],
   },
   {
     id: 'estado_civil',
@@ -121,9 +115,8 @@ export const QUESTIONS = [
     type: 'select',
     required: true,
     options: [
-      { label: 'Sí', value: 'si' },
-      { label: 'No', value: 'no' },
-      { label: 'Depende de la oportunidad', value: 'depende' },
+      { label: 'Sí', value: 1 },
+      { label: 'No', value: 0 },
     ],
   },
   {
@@ -141,12 +134,8 @@ export const QUESTIONS = [
     question: '¿En qué ciudad quieres tomar el programa?',
     type: 'select',
     required: true,
-    options: [
-      { label: 'Bogotá', value: 'bogota' },
-      { label: 'Cali', value: 'cali' },
-      { label: 'Medellín', value: 'medellin' },
-      { label: 'Región Caribe', value: 'region_caribe' },
-    ],
+    isDynamic: true,
+    options: [],
   },
   {
     id: 'nivel_educativo',

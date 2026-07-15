@@ -10,8 +10,10 @@ const getProfesiones = async (req, res) => {
     `);
 
         const profesiones = rows.map((profession) => ({
+            id: profession.id,
+            name: profession.name,
             label: profession.name,
-            value: profession.name
+            value: profession.id
         }));
 
         res.json(profesiones);

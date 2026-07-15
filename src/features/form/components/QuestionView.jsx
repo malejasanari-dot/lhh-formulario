@@ -5,8 +5,11 @@ import { cn } from '../../../utils/cn';
 import { DatePicker } from '../../../components/ui/DatePicker';
 import { InternationalPhoneField } from '../../../components/ui/InternationalPhoneField';
 
-const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, isError, onRetry, catalogs }) => {
-  const [value, setValue] = useState(question.type === 'multiselect' ? [] : '');
+const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, isError, onRetry, catalogs, initialValue }) => {
+  const [value, setValue] = useState(() => {
+    if (initialValue !== undefined && initialValue !== null) return initialValue;
+    return question.type === 'multiselect' ? [] : '';
+  });
   const [levels, setLevels] = useState({});
   const [error, setError] = useState(null);
   const [showAllOptions, setShowAllOptions] = useState(false);
@@ -72,13 +75,17 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
 
   // Reset value when question changes
   useEffect(() => {
-    setValue(question.type === 'multiselect' ? [] : '');
+    setValue(
+      initialValue !== undefined && initialValue !== null
+        ? initialValue
+        : (question.type === 'multiselect' ? [] : '')
+    );
     setLevels({});
     setError(null);
     setShowAllOptions(false);
     setDropdownOpen(false);
     setDropdownSearchTerm('');
-  }, [question.id, question.type]);
+  }, [question.id, question.type, initialValue]);
 
   useEffect(() => {
     if (!dropdownOpen) {

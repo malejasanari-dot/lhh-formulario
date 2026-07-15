@@ -6,6 +6,7 @@ import { useCatalogs } from '../../hooks/useCatalogs';
 import WelcomeScreen from './components/WelcomeScreen';
 import QuestionView from './components/QuestionView';
 import WorkExperienceSection from './components/WorkExperienceSection';
+import EmailVerification from './components/EmailVerification';
 import { FORM_PHASES, QUESTIONS } from './constants';
 
 const FormContainer = () => {
@@ -15,6 +16,18 @@ const FormContainer = () => {
   const { currentStep, nextStep, prevStep, progress } = useFormStep(totalSteps);
   const [formData, setFormData] = useState({});
   const [direction, setDirection] = useState(0);
+  const [isVerified, setIsVerified] = useState(false);
+
+  const handleVerified = (userData) => {
+    setFormData(prev => ({
+      ...prev,
+      userId: userData.userId,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      email: userData.email
+    }));
+    setIsVerified(true);
+  };
 
   // Hook para gestionar catálogos dinámicos
   const {
@@ -218,6 +231,32 @@ const FormContainer = () => {
       ? FORM_PHASES.find(p => p.id === currentQuestion.phaseId)
       : null;
 
+    if (!isVerified) {
+      return (
+        <FormLayout
+          progress={0}
+          currentPhase={null}
+          totalSteps={formQuestions.length}
+          currentStepIndex={-1}
+        >
+          <div className="w-full relative">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="verification"
+                variants={variants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="w-full"
+              >
+                <EmailVerification onVerified={handleVerified} />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </FormLayout>
+      );
+    }
+
     return (
       <FormLayout
         progress={progress}
@@ -257,6 +296,13 @@ const FormContainer = () => {
                   isLoading={loading[currentQuestion?.id]}
                   isError={errors[currentQuestion?.id]}
                   catalogs={catalogs}
+                  initialValue={
+                    currentQuestion?.id === 'nombre' 
+                      ? formData.firstName 
+                      : currentQuestion?.id === 'apellido' 
+                        ? formData.lastName 
+                        : formData[currentQuestion?.id]
+                  }
                   onRetry={() => {
                     if (currentQuestion?.id === 'nivel_educativo') {
                       fetchEducationLevels();

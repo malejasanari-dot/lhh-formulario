@@ -41,9 +41,6 @@ const createCandidato = async (req, res) => {
         const cityId = data.ciudad || null;
         const gender = data.genero || null;
 
-        // TODO: TEMPORAL PARA DESARROLLO - ELIMINAR CUANDO EL LOGIN ESTÉ INTEGRADO
-        const { email, password } = generateDevUserCredentials();
-
         console.log({
           firstName,
           lastName,
@@ -58,16 +55,31 @@ const createCandidato = async (req, res) => {
           gender
         });
 
-        // Insertar en la tabla users
-        const [result] = await db.query(
-            `INSERT INTO users (first_name, last_name, id_number, address, mobile, phone, email, password, id_type_id, office_id, birthday, city_id, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [firstName, lastName, idNumber, address, mobile, phone, email, password, idTypeId, officeId, birthday, cityId, gender]
-        );
+        let userId;
 
-        console.log('InsertId:', result.insertId);
-        console.log('AffectedRows:', result.affectedRows);
+        if (data.userId) {
+            console.log(`Flujo nuevo: UPDATE users | ID: ${data.userId} | Nombre: ${firstName} ${lastName}`);
+            await db.query(
+                `UPDATE users SET first_name = ?, last_name = ?, id_type_id = ?, id_number = ?, address = ?, mobile = ?, phone = ?, birthday = ?, city_id = ?, gender = ?, office_id = ? WHERE id = ?`,
+                [firstName, lastName, idTypeId, idNumber, address, mobile, phone, birthday, cityId, gender, officeId, data.userId]
+            );
+            userId = data.userId;
+        } else {
+            console.log('Flujo antiguo: INSERT users');
+            // TODO: TEMPORAL PARA DESARROLLO - ELIMINAR CUANDO EL LOGIN ESTÉ INTEGRADO
+            const { email, password } = generateDevUserCredentials();
 
-        const userId = result.insertId;
+            // Insertar en la tabla users
+            const [result] = await db.query(
+                `INSERT INTO users (first_name, last_name, id_number, address, mobile, phone, email, password, id_type_id, office_id, birthday, city_id, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [firstName, lastName, idNumber, address, mobile, phone, email, password, idTypeId, officeId, birthday, cityId, gender]
+            );
+
+            console.log('InsertId:', result.insertId);
+            console.log('AffectedRows:', result.affectedRows);
+
+            userId = result.insertId;
+        }
 
         if (data.linkedin && data.linkedin.trim() !== '') {
             const linkedinUrl = data.linkedin.trim();
@@ -355,9 +367,9 @@ const createCandidato = async (req, res) => {
 
         res.status(200).json({
             status: 'success',
-            message: 'Formulario recibido correctamente y usuario creado',
+            message: 'Formulario recibido correctamente y usuario procesado',
             data: {
-                userId: result.insertId
+                userId
             }
         });
 

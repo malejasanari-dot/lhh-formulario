@@ -8,6 +8,7 @@ const express = require('express');
 const router = express.Router();
 const healthController = require('../controllers/healthController');
 const candidatosController = require('../controllers/candidatosController'); // Importar controlador de candidatos
+const { findByEmail } = require('../controllers/usersController'); // Importar controlador de usuarios
 const db = require('../db/connection'); // Importar el pool de conexión
 const { getMaritalStatuses } = require('../controllers/maritalStatusesController');
 const { getProfesiones } = require('../controllers/profesionesController');
@@ -109,6 +110,12 @@ router.get('/db-test', async (req, res) => {
  * POST /api/candidatos
  */
 router.post('/candidatos', candidatosController.createCandidato);
+
+/**
+ * Endpoint para consultar usuario por correo electrónico
+ * POST /api/users/find-email
+ */
+router.post('/users/find-email', findByEmail);
 
 // Configuración de Multer para la subida de fotografías
 const multer = require('multer');

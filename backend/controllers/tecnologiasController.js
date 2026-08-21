@@ -10,8 +10,10 @@ const getTecnologias = async (req, res) => {
     `);
 
         const tecnologias = rows.map((technology) => ({
+            id: technology.id,
+            name: technology.name,
             label: technology.name,
-            value: technology.name
+            value: technology.id
         }));
 
         res.json(tecnologias);

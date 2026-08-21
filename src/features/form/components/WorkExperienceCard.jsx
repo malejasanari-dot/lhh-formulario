@@ -1,6 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Save, Trash2, Calendar, DollarSign, Briefcase } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Save, Trash2, Calendar, DollarSign, Briefcase, Plus } from 'lucide-react';
 import { FormDropdown } from './FormDropdown';
 import { PackageItemsSelector } from './PackageItemsSelector';
 import { cn } from '../../../utils/cn';
@@ -33,6 +33,16 @@ export const WorkExperienceCard = ({
   isOnly = true,
   catalogs = {}
 }) => {
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
+  const [newCompanyName, setNewCompanyName] = useState('');
+  const [selectedEconomicSector, setSelectedEconomicSector] = useState(null);
+
+  const closeCompanyModal = () => {
+    setIsCompanyModalOpen(false);
+    setNewCompanyName('');
+    setSelectedEconomicSector(null);
+  };
+
   console.log('WorkExperienceCard catalogs', catalogs);
   const handleFieldChange = (field, val) => {
     onChange({
@@ -57,7 +67,9 @@ export const WorkExperienceCard = ({
             <Briefcase className="w-4 h-4" />
           </div>
           <span className="text-xs font-bold uppercase tracking-widest text-content-primary opacity-90">
-            {catalogs?.companies?.find(e => e.value === experience.empresa)?.label || experience.empresa || 'Última experiencia'}
+            {(typeof experience.empresa === 'object' && experience.empresa !== null)
+              ? (experience.empresa.empresa || 'Última experiencia')
+              : (catalogs?.companies?.find(e => e.value === experience.empresa)?.label || experience.empresa || 'Última experiencia')}
           </span>
         </div>
 
@@ -75,15 +87,31 @@ export const WorkExperienceCard = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
         {/* Empresa */}
-        <FormDropdown
-          label="Empresa"
-          value={experience.empresa}
-          onChange={(val) => handleFieldChange('empresa', val)}
-          options={catalogs?.companies || []}
-          placeholder="Busca y selecciona la empresa..."
-          showSearch={true}
-          error={errors.empresa}
-        />
+        <div className="relative">
+          <FormDropdown
+            label="Empresa"
+            value={experience.empresa}
+            onChange={(val) => handleFieldChange('empresa', val)}
+            options={catalogs?.companies || []}
+            placeholder="Busca y selecciona la empresa..."
+            showSearch={true}
+            error={errors.empresa}
+            onCreateOption={(val) => {
+              // Also open modal from the dropdown's "Create" option (implemented previously)
+              setNewCompanyName(val);
+              setIsCompanyModalOpen(true);
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => setIsCompanyModalOpen(true)}
+            className="absolute top-0 right-0 flex items-center gap-1 text-action-primary hover:bg-surface-hover px-2 py-0.5 rounded-md transition-colors"
+            title="Agregar nueva empresa"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span className="text-[10px] font-bold uppercase tracking-wider">Crear</span>
+          </button>
+        </div>
 
         {/* Nivel Laboral */}
         <FormDropdown
@@ -189,6 +217,16 @@ export const WorkExperienceCard = ({
           )}
         </div>
 
+        {/* Rango Salarial */}
+        <FormDropdown
+          label="Rango Salarial"
+          value={experience.salarial_range_id}
+          onChange={(val) => handleFieldChange('salarial_range_id', val)}
+          options={catalogs.salarial_ranges || []}
+          placeholder="Selecciona el rango salarial"
+          error={errors.salarial_range_id}
+        />
+
         {/* Fecha de retiro */}
         <div className="space-y-1">
           <label className="block text-[11px] font-bold text-content-secondary uppercase tracking-widest pl-1">
@@ -230,6 +268,74 @@ export const WorkExperienceCard = ({
           />
         </div>
       </div>
+
+      {/* Modal Crear Empresa */}
+      <AnimatePresence>
+        {isCompanyModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="company-modal-card border p-6 rounded-2xl w-full max-w-sm shadow-[var(--shadow-premium)] relative overflow-visible"
+            >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-lhh-primary-purple to-lhh-accent-pink" />
+              <h3 className="text-lg font-bold text-content-primary mb-5 mt-2">Agregar Nueva Empresa</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-content-secondary uppercase tracking-widest pl-1 mb-1.5">
+                    Nombre de la empresa
+                  </label>
+                  <input
+                    type="text"
+                    value={newCompanyName}
+                    onChange={(e) => setNewCompanyName(e.target.value)}
+                    placeholder="Ej. Microsoft"
+                    className="w-full bg-surface-card border border-border-subtle rounded-xl px-4 py-3 text-sm text-content-primary focus:outline-none focus:border-border-strong focus:ring-2 focus:ring-focus-ring"
+                    autoFocus
+                  />
+                </div>
+                
+                <div className="relative">
+                  <FormDropdown
+                    label="Sector económico"
+                    value={selectedEconomicSector}
+                    onChange={(val) => setSelectedEconomicSector(val)}
+                    options={catalogs?.economicSectors || []}
+                    placeholder="Selecciona el sector..."
+                    showSearch={true}
+                  />
+                </div>
+
+                <div className="flex gap-3 justify-end mt-8">
+                  <button
+                    type="button"
+                    onClick={closeCompanyModal}
+                    className="px-4 py-2 text-sm font-medium text-content-secondary hover:bg-surface-hover rounded-xl transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const payload = {
+                        empresa: newCompanyName.trim(),
+                        sector: Number(selectedEconomicSector)
+                      };
+                      handleFieldChange('empresa', payload);
+                      closeCompanyModal();
+                    }}
+                    disabled={!newCompanyName.trim() || !selectedEconomicSector}
+                    className="px-4 py-2 text-sm font-medium bg-action-primary text-white rounded-xl hover:bg-action-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

@@ -10,7 +10,9 @@ export const WorkExperienceSummary = ({
   index,
   catalogs = {}
 }) => {
-  const empresaLabel = catalogs?.companies?.find(e => e.value === experience.empresa)?.label || experience.empresa || 'Empresa sin nombre';
+  const empresaLabel = (typeof experience.empresa === 'object' && experience.empresa !== null)
+    ? (experience.empresa.empresa || 'Empresa sin nombre')
+    : (catalogs?.companies?.find(e => e.value === experience.empresa)?.label || experience.empresa || 'Empresa sin nombre');
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}

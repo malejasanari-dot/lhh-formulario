@@ -11,7 +11,8 @@ export const FormDropdown = ({
   placeholder = 'Selecciona una opción',
   error,
   multiselect = false,
-  showSearch = false
+  showSearch = false,
+  onCreateOption
 }) => {
   console.log('FormDropdown options', options);
   const [isOpen, setIsOpen] = useState(false);
@@ -59,6 +60,9 @@ export const FormDropdown = ({
       });
     } else {
       if (!value) return null;
+      if (typeof value === 'object' && value !== null && value.empresa) {
+        return value.empresa;
+      }
       const found = options.find(opt => (opt.value || opt) === value);
       return found ? (found.label || found) : value;
     }
@@ -154,9 +158,23 @@ export const FormDropdown = ({
 
             <div className="overflow-y-auto flex-1 py-1 max-h-48">
               {filteredOptions.length === 0 ? (
-                <div className="px-4 py-3 text-xs text-content-secondary text-center">
-                  No hay opciones
-                </div>
+                onCreateOption && searchTerm.trim() !== '' ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onCreateOption(searchTerm.trim());
+                      setIsOpen(false);
+                      setSearchTerm('');
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-xs transition-colors flex items-center justify-between hover:bg-surface-hover hover:shadow-[inset_3px_0_0_var(--state-active-border)] cursor-pointer text-action-primary font-medium"
+                  >
+                    <span className="truncate">+ Crear "{searchTerm}"</span>
+                  </button>
+                ) : (
+                  <div className="px-4 py-3 text-xs text-content-secondary text-center">
+                    No hay opciones
+                  </div>
+                )
               ) : (
                 filteredOptions.map((option, idx) => {
                   const optVal = option.value !== undefined ? option.value : option;

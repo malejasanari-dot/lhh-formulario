@@ -84,6 +84,23 @@ export const catalogService = {
       throw error;
     }
   },
+
+  /**
+   * Obtiene la lista de niveles de idiomas.
+   */
+  getLanguageLevels: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/language-levels`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getLanguageLevels:', error);
+      throw error;
+    }
+  },
+
   /**
    * Obtiene la lista de tecnologías.
    */
@@ -98,7 +115,7 @@ export const catalogService = {
       console.error('Error en catalogService.getTechnologies:', error);
       throw error;
     }
-},
+  },
 
   // Agregar los otros métodos:
 
@@ -178,6 +195,166 @@ export const catalogService = {
       return await response.json();
     } catch (error) {
       console.error('Error en catalogService.getCompanies:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene la lista de sectores económicos.
+   */
+  getEconomicSectors: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/economic-sectors`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getEconomicSectors:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene la lista de oficinas.
+   */
+  getOffices: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/offices`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getOffices:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene la lista de tipos de documento.
+   */
+  getIdTypes: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/id-types`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getIdTypes:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene la lista de géneros.
+   */
+  getGenders: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/genders`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getGenders:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene la lista de rangos salariales.
+   */
+  getSalarialRanges: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/salarial-ranges`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getSalarialRanges:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene la lista de sectores económicos.
+   */
+  getEconomicSectors: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/economic-sectors`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getEconomicSectors:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene la lista de oficinas.
+   */
+  getOffices: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/offices`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getOffices:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene la lista de tipos de documento.
+   */
+  getIdTypes: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/id-types`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getIdTypes:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene la lista de géneros.
+   */
+  getGenders: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/genders`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getGenders:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene la lista de rangos salariales.
+   */
+  getSalarialRanges: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/salarial-ranges`);
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error en catalogService.getSalarialRanges:', error);
       throw error;
     }
   },

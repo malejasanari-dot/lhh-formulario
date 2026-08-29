@@ -1,16 +1,38 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, Check, AlertCircle, Plus, X, RefreshCw, Loader2, Upload, Camera, Search } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, AlertCircle, Plus, X, RefreshCw, Upload, Search } from 'lucide-react';
 import { cn } from '../../../utils/cn';
-import { DatePicker } from '../../../components/ui/DatePicker';
 import { InternationalPhoneField } from '../../../components/ui/InternationalPhoneField';
 
 const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, isError, onRetry, catalogs, initialValue }) => {
+  // requiresLevel questions store {language, level} pairs; split them back into
+  // a plain value array plus a language -> level map for editing.
+  const splitLanguageValue = (rawValue, requiresLevel) => {
+    if (!requiresLevel || !Array.isArray(rawValue)) {
+      return { values: rawValue, levelsMap: {} };
+    }
+    const values = [];
+    const levelsMap = {};
+    rawValue.forEach((entry) => {
+      if (entry && typeof entry === 'object' && 'language' in entry) {
+        values.push(entry.language);
+        if (entry.level !== undefined) {
+          levelsMap[entry.language] = entry.level;
+        }
+      } else {
+        values.push(entry);
+      }
+    });
+    return { values, levelsMap };
+  };
+
   const [value, setValue] = useState(() => {
-    if (initialValue !== undefined && initialValue !== null) return initialValue;
+    if (initialValue !== undefined && initialValue !== null) {
+      return splitLanguageValue(initialValue, question.requiresLevel).values;
+    }
     return question.type === 'multiselect' ? [] : '';
   });
-  const [levels, setLevels] = useState({});
+  const [levels, setLevels] = useState(() => splitLanguageValue(initialValue, question.requiresLevel).levelsMap);
   const [error, setError] = useState(null);
   const [showAllOptions, setShowAllOptions] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -20,6 +42,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
 
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
+  const [isCheckingDocument, setIsCheckingDocument] = useState(false);
 
   const isCompact = question.variant === 'compact';
   const maxVisible = isCompact ? 9 : 6;
@@ -75,12 +98,13 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
 
   // Reset value when question changes
   useEffect(() => {
+    const { values, levelsMap } = splitLanguageValue(initialValue, question.requiresLevel);
     setValue(
       initialValue !== undefined && initialValue !== null
-        ? initialValue
+        ? values
         : (question.type === 'multiselect' ? [] : '')
     );
-    setLevels({});
+    setLevels(levelsMap);
     setError(null);
     setShowAllOptions(false);
     setDropdownOpen(false);
@@ -93,7 +117,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
     }
   }, [dropdownOpen]);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (question.required) {
       if (question.type === 'multiselect' && (!value || value.length === 0)) {
         setError('Por favor selecciona al menos una opción');
@@ -102,6 +126,35 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
       if (question.type !== 'multiselect' && (value === '' || value === null || value === undefined || !value.toString().trim())) {
         setError('Este campo es obligatorio');
         return;
+      }
+    }
+
+    if (question.id === 'numero_documento') {
+      setIsCheckingDocument(true);
+      try {
+        const response = await fetch(`/candidate/check-document/${value}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        });
+
+        // 404 means the document is not registered yet, so it's available.
+        if (response.status !== 404 && response.ok) {
+          setError('Este número de documento ya está registrado.');
+          return;
+        }
+
+        if (response.status !== 404 && !response.ok) {
+          throw new Error(`Error en la petición HTTP: ${response.status}`);
+        }
+      } catch (err) {
+        console.error('Error al verificar el número de documento:', err);
+        setError('No se pudo verificar el número de documento. Intenta nuevamente.');
+        return;
+      } finally {
+        setIsCheckingDocument(false);
       }
     }
 
@@ -117,6 +170,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
+      if (isCheckingDocument) return;
       if (question.type === 'select' || question.type === 'multiselect') {
         if (isValueValid) handleNext();
       } else {
@@ -638,16 +692,16 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
       >
         <button
           onClick={handleNext}
-          disabled={!isValueValid}
+          disabled={!isValueValid || isCheckingDocument}
           className={cn(
             "flex items-center gap-2 px-10 py-5 font-bold rounded-2xl transition-all duration-300 group shadow-xl active:scale-95",
-            !isValueValid
+            !isValueValid || isCheckingDocument
               ? "bg-surface-card text-content-secondary cursor-not-allowed border border-border-subtle"
               : "bg-gradient-to-r from-lhh-primary-magenta to-lhh-accent-pink text-action-primary-text hover:shadow-[var(--shadow-magenta-glow)] shadow-action-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           )}
         >
-          {isLast ? 'Enviar' : 'Continuar'}
-          <ChevronRight className={cn("w-5 h-5 transition-transform", isValueValid && "group-hover:translate-x-1")} />
+          {isCheckingDocument ? 'Verificando...' : (isLast ? 'Enviar' : 'Continuar')}
+          <ChevronRight className={cn("w-5 h-5 transition-transform", isValueValid && !isCheckingDocument && "group-hover:translate-x-1")} />
         </button>
 
         {!question.required && !isLast && (
@@ -673,4 +727,3 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
 };
 
 export default QuestionView;
-

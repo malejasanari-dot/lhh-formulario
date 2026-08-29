@@ -3,7 +3,7 @@
  * Centraliza las peticiones para mantener el código limpio y reutilizable.
  */
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const catalogService = {
   /**

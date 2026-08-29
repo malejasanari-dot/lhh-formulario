@@ -167,7 +167,7 @@ export const QUESTIONS = [
     variant: 'compact',
     required: true,
     isDynamic: true,
-    options: [], // Se cargará dinámicamente desde el backend 
+    options: [], // Se cargará dinámicamente desde el backend
   },
   {
     id: 'idiomas',
@@ -190,7 +190,7 @@ export const QUESTIONS = [
     variant: 'compact',
     required: false,
     isDynamic: true,
-    options: [], // Se cargará dinámicamente desde el backend 
+    options: [], // Se cargará dinámicamente desde el backend
   },
   {
     id: 'historia_laboral',
@@ -201,4 +201,3 @@ export const QUESTIONS = [
     required: true,
   }
 ];
-

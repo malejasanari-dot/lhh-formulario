@@ -3,31 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import FormLayout from '../../components/layout/FormLayout';
 import { useFormStep } from '../../hooks/useFormStep';
 import { useCatalogs } from '../../hooks/useCatalogs';
-import WelcomeScreen from './components/WelcomeScreen';
 import QuestionView from './components/QuestionView';
 import WorkExperienceSection from './components/WorkExperienceSection';
-import EmailVerification from './components/EmailVerification';
 import { FORM_PHASES, QUESTIONS } from './constants';
 
 const FormContainer = () => {
   const [formQuestions, setFormQuestions] = useState(QUESTIONS);
-  const totalSteps = formQuestions.length + 1;
+  const totalSteps = formQuestions.length;
 
   const { currentStep, nextStep, prevStep, progress } = useFormStep(totalSteps);
   const [formData, setFormData] = useState({});
   const [direction, setDirection] = useState(0);
-  const [isVerified, setIsVerified] = useState(false);
-
-  const handleVerified = (userData) => {
-    setFormData(prev => ({
-      ...prev,
-      userId: userData.userId,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      email: userData.email
-    }));
-    setIsVerified(true);
-  };
 
   // Hook para gestionar catálogos dinámicos
   const {
@@ -52,7 +38,35 @@ const FormContainer = () => {
     fetchLanguageLevels,
     fetchSalarialRanges
   } = useCatalogs();
-  console.log('FormContainer catalogs', catalogs);
+  // Cargar los datos del usuario al iniciar el formulario
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const response = await fetch('/user', {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const user = await response.json();
+        setFormData(prev => ({
+          ...prev,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          email: user.email
+        }));
+      } catch (error) {
+        console.error('Error cargando los datos del usuario:', error);
+      }
+    };
+
+    loadUserData();
+  }, []);
+
   // Cargar catálogos dinámicos
   useEffect(() => {
     fetchCities();
@@ -78,28 +92,24 @@ const FormContainer = () => {
   useEffect(() => {
     setFormQuestions(prev =>
       prev.map(q => {
-        if (q.isDynamic) {
-          const catalogKey =
-            q.id === 'idioma_nativo'
-              ? 'idiomas'
-              : q.id === 'empresa'
-                ? 'companies'
-                : q.id === 'ciudad_programa'
-                  ? 'offices'
-                  : q.id === 'tipo_documento'
-                    ? 'idTypes'
-                    : q.id === 'genero'
-                      ? 'genders'
-                      : q.id;
-          if (catalogs[catalogKey]) {
-            return {
-              ...q,
-              options: catalogs[catalogKey]
-            };
-          }
+        if (!q.isDynamic) {
+          return q;
         }
-
-        return q;
+        const catalogKeys = {
+          'idioma_nativo': 'idiomas',
+          'empresa': 'companies',
+          'ciudad_programa': 'offices',
+          'tipo_documento': 'idTypes',
+          'genero': 'genders'
+        };
+        const catalogKey = catalogKeys[q.id] || q.id;
+        if (!catalogs[catalogKey]) {
+          return q;
+        }
+        return {
+          ...q,
+          options: catalogs[catalogKey]
+        };
       })
     );
   }, [catalogs]);
@@ -149,6 +159,22 @@ const FormContainer = () => {
     }),
   };
 
+  // Recursively appends a value to FormData using PHP-style bracket notation (e.g. jobs[0][cargo]).
+  const appendToFormData = (formDataInstance, key, value) => {
+    if (value === undefined || value === null) {
+      return;
+    }
+    if (value instanceof File) {
+      formDataInstance.append(key, value);
+    } else if (Array.isArray(value)) {
+      value.forEach((item, index) => appendToFormData(formDataInstance, `${key}[${index}]`, item));
+    } else if (typeof value === 'object') {
+      Object.entries(value).forEach(([childKey, childValue]) => appendToFormData(formDataInstance, `${key}[${childKey}]`, childValue));
+    } else {
+      formDataInstance.append(key, value);
+    }
+  };
+
   const handleNext = async (stepData) => {
     setDirection(1);
 
@@ -161,56 +187,41 @@ const FormContainer = () => {
       setFormData(updatedData);
     }
 
-    if (currentStep === totalSteps - 1) {
+    if (currentStep !== totalSteps - 1) {
+      nextStep();
+      return;
+    }
 
-      console.log('========== FORM DATA ==========');
-      console.log(updatedData);
-      console.log('===============================');
+    console.log('========== FORM DATA ==========');
+    console.log(updatedData);
+    console.log('===============================');
 
-      // Separar la foto de los datos del candidato para no enviarla por el JSON principal
-      const { foto, ...candidatosData } = updatedData;
+    try {
+      const candidateFormData = new FormData();
 
-      try {
-        // 1. Enviar datos de texto/catálogos del candidato en formato JSON
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/candidatos`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(candidatosData),
-        });
+      Object.entries(updatedData).forEach(([key, value]) => {
+        appendToFormData(candidateFormData, key, value);
+      });
 
-        if (!response.ok) {
-          throw new Error(`Error en la petición HTTP: ${response.status}`);
-        }
+      const response = await fetch('/candidate/form', {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: candidateFormData,
+      });
 
-        const data = await response.json();
-        console.log('Formulario de candidato enviado con éxito:', data);
-
-        // 2. Si existe un archivo de fotografía, subirlo físicamente al backend
-        if (foto && foto instanceof File) {
-          const photoFormData = new FormData();
-          photoFormData.append('foto', foto);
-
-          const photoResponse = await fetch(`${import.meta.env.VITE_API_URL}/candidatos/foto`, {
-            method: 'POST',
-            body: photoFormData,
-          });
-
-          if (!photoResponse.ok) {
-            throw new Error(`Error al subir la fotografía: ${photoResponse.status}`);
-          }
-
-          const photoData = await photoResponse.json();
-          console.log('Fotografía subida y guardada físicamente:', photoData);
-        }
-
-      } catch (error) {
-        console.error('Error al enviar el formulario al backend:', error);
+      if (!response.ok) {
+        throw new Error(`Error en la petición HTTP: ${response.status}`);
       }
 
-    } else {
-      nextStep();
+      const data = await response.json();
+      console.log('Formulario de candidato enviado con éxito:', data);
+      // Redirect to /candidate after successful form submission
+      window.location.href = '/candidate';
+    } catch (error) {
+      console.error('Error al enviar el formulario al backend:', error);
     }
   };
 
@@ -219,103 +230,70 @@ const FormContainer = () => {
     prevStep();
   };
 
-  const isWelcome = currentStep === 0;
-
-  const currentQuestionIndex = currentStep - 1;
-
-  const currentQuestion = !isWelcome
-    ? formQuestions[currentQuestionIndex]
-    : null;
+  const currentQuestionIndex = currentStep;
+  const currentQuestion = formQuestions[currentQuestionIndex];
 
   const currentPhase = currentQuestion
     ? FORM_PHASES.find(p => p.id === currentQuestion.phaseId)
     : null;
 
-  if (!isVerified) {
-    return (
-      <FormLayout
-        progress={0}
-        currentPhase={null}
-        totalSteps={formQuestions.length}
-        currentStepIndex={-1}
-      >
-        <div className="w-full relative">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key="verification"
-              variants={variants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="w-full"
-            >
-              <EmailVerification onVerified={handleVerified} />
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </FormLayout>
-    );
-  }
-
   return (
-      <FormLayout
-        progress={progress}
-        currentPhase={currentPhase}
-        totalSteps={formQuestions.length}
-        currentStepIndex={isWelcome ? -1 : currentQuestionIndex}
-      >
-        <div className="w-full relative">
-          <AnimatePresence mode="wait" custom={direction}>
-            <motion.div
-              key={currentStep}
-              custom={direction}
-              variants={variants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="w-full"
-            >
-            {isWelcome ? (
-              <WelcomeScreen onStart={handleNext} />
-            ) : currentQuestion?.type === 'work_experience' ? (
-              <WorkExperienceSection
-                question={currentQuestion}
-                onNext={handleNext}
-                onPrev={handlePrev}
-                isFirst={currentStep === 1}
-                isLast={currentStep === totalSteps - 1}
-                catalogs={catalogs}
-              />
-            ) : (
-              <QuestionView
-                question={currentQuestion}
-                onNext={handleNext}
-                onPrev={handlePrev}
-                isFirst={currentStep === 1}
-                isLast={currentStep === totalSteps - 1}
-                isLoading={loading[currentQuestion?.id]}
-                isError={errors[currentQuestion?.id]}
-                catalogs={catalogs}
-                initialValue={
-                  currentQuestion?.id === 'nombre'
-                    ? formData.firstName
-                    : currentQuestion?.id === 'apellido'
-                      ? formData.lastName
-                      : formData[currentQuestion?.id]
-                }
-                onRetry={() => {
-                  if (currentQuestion?.id === 'nivel_educativo') {
-                    fetchEducationLevels();
-                  }
-
-                if (currentQuestion?.id === 'ciudad') {
-                  fetchCities();
+    <FormLayout
+      progress={progress}
+      currentPhase={currentPhase}
+      totalSteps={formQuestions.length}
+      currentStepIndex={currentQuestionIndex}
+    >
+      <div className="w-full relative">
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div
+            key={currentStep}
+            custom={direction}
+            variants={variants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="w-full"
+          >
+          {currentQuestion?.type === 'work_experience' ? (
+            <WorkExperienceSection
+              question={currentQuestion}
+              onNext={handleNext}
+              onPrev={handlePrev}
+              isFirst={currentStep === 0}
+              isLast={currentStep === totalSteps - 1}
+              catalogs={catalogs}
+            />
+          ) : (
+            <QuestionView
+              question={currentQuestion}
+              onNext={handleNext}
+              onPrev={handlePrev}
+              isFirst={currentStep === 0}
+              isLast={currentStep === totalSteps - 1}
+              isLoading={loading[currentQuestion?.id]}
+              isError={errors[currentQuestion?.id]}
+              catalogs={catalogs}
+              initialValue={
+                currentQuestion?.id === 'nombre'
+                  ? formData.firstName
+                  : currentQuestion?.id === 'apellido'
+                    ? formData.lastName
+                    : formData[currentQuestion?.id]
+              }
+              onRetry={() => {
+                if (currentQuestion?.id === 'nivel_educativo') {
+                  fetchEducationLevels();
                 }
 
-                if (currentQuestion?.id === 'profesiones') {
-                  fetchProfessions();
-                }
-              }}
+              if (currentQuestion?.id === 'ciudad') {
+                fetchCities();
+              }
+
+              if (currentQuestion?.id === 'profesiones') {
+                fetchProfessions();
+              }
+            }}
             />
           )}
           </motion.div>

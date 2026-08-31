@@ -140,14 +140,14 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
           }
         });
 
-        // 404 means the document is not registered yet, so it's available.
-        if (response.status !== 404 && response.ok) {
-          setError('Este número de documento ya está registrado.');
-          return;
+        if (!response.ok) {
+          throw new Error(`Error en la petición HTTP: ${response.status}`);
         }
 
-        if (response.status !== 404 && !response.ok) {
-          throw new Error(`Error en la petición HTTP: ${response.status}`);
+        const data = await response.json();
+        if (data.exists) {
+          setError('Este número de documento ya está registrado.');
+          return;
         }
       } catch (err) {
         console.error('Error al verificar el número de documento:', err);

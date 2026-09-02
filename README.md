@@ -2,6 +2,18 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## Build and deploy
+
+```sh
+SILHH_PATH=~/Personal/silhh
+nvm install
+nvm use
+npm run build
+rm -f $SILHH_PATH/public/assets/index-*
+mv dist/assets/* $SILHH_PATH/public/assets/
+mv dist/index.html $SILHH_PATH/resources/views/candidate/form.blade.php
+```
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)

@@ -117,6 +117,15 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
     }
   }, [dropdownOpen]);
 
+  const isValidLinkedInUrl = (url) => {
+    if (!url || !String(url).trim()) return true;
+
+    const normalized = String(url).trim();
+    const linkedinUrlPattern = /^(https?:\/\/)?(www\.)?linkedin\.com\/(in|company)\/[A-Za-z0-9-_%]+\/?$/i;
+
+    return linkedinUrlPattern.test(normalized);
+  };
+
   const handleNext = async () => {
     if (question.required) {
       if (question.type === 'multiselect' && (!value || value.length === 0)) {
@@ -127,6 +136,11 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
         setError('Este campo es obligatorio');
         return;
       }
+    }
+
+    if (question.id === 'linkedin' && !isValidLinkedInUrl(value)) {
+      setError('La URL de LinkedIn no es válida. Ejemplo: https://www.linkedin.com/in/tu-perfil');
+      return;
     }
 
     if (question.id === 'numero_documento') {

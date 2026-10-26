@@ -7,7 +7,7 @@ import { normalizeLinkedInUrl, isValidLinkedInUrl } from '../../../utils/linkedi
 
 const LINKEDIN_ERROR = 'La URL de LinkedIn no es válida. Ejemplo: https://www.linkedin.com/in/tu-perfil';
 
-const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, isError, onRetry, catalogs, initialValue }) => {
+const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isSubmitting, submitError, isLoading, isError, onRetry, catalogs, initialValue }) => {
   // requiresLevel questions store {language, level} pairs; split them back into
   // a plain value array plus a language -> level map for editing.
   const splitLanguageValue = (rawValue, requiresLevel) => {
@@ -192,7 +192,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      if (isCheckingDocument) return;
+      if (isCheckingDocument || isSubmitting) return;
       if (question.type === 'select' || question.type === 'multiselect') {
         if (isValueValid) handleNext();
       } else {
@@ -713,7 +713,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
         )}
 
         <AnimatePresence>
-          {error && (
+          {(error || submitError) && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -721,7 +721,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
               className="absolute -bottom-8 left-0 flex items-center gap-2 text-red-500 text-sm font-medium"
             >
               <AlertCircle className="w-4 h-4" />
-              {error}
+              {error || submitError}
             </motion.div>
           )}
         </AnimatePresence>
@@ -735,16 +735,16 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
       >
         <button
           onClick={handleNext}
-          disabled={!isValueValid || isCheckingDocument}
+          disabled={!isValueValid || isCheckingDocument || isSubmitting}
           className={cn(
             "flex items-center gap-2 px-10 py-5 font-bold rounded-2xl transition-all duration-300 group shadow-xl active:scale-95",
-            !isValueValid || isCheckingDocument
+            !isValueValid || isCheckingDocument || isSubmitting
               ? "bg-surface-card text-content-secondary cursor-not-allowed border border-border-subtle"
               : "bg-gradient-to-r from-lhh-primary-magenta to-lhh-accent-pink text-action-primary-text hover:shadow-[var(--shadow-magenta-glow)] shadow-action-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
           )}
         >
-          {isCheckingDocument ? 'Verificando...' : (isLast ? 'Enviar' : 'Continuar')}
-          <ChevronRight className={cn("w-5 h-5 transition-transform", isValueValid && !isCheckingDocument && "group-hover:translate-x-1")} />
+          {isSubmitting ? 'Guardando...' : isCheckingDocument ? 'Verificando...' : (isLast ? 'Enviar' : 'Continuar')}
+          <ChevronRight className={cn("w-5 h-5 transition-transform", isValueValid && !isCheckingDocument && !isSubmitting && "group-hover:translate-x-1")} />
         </button>
 
         {!question.required && !isLast && (

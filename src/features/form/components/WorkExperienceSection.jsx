@@ -43,6 +43,8 @@ export const WorkExperienceSection = ({
   onPrev,
   isFirst,
   isLast,
+  isSubmitting,
+  submitError,
   catalogs
 }) => {
   console.log('WorkExperienceSection catalogs', catalogs);
@@ -282,7 +284,7 @@ export const WorkExperienceSection = ({
 
       {/* Global Error Banner */}
       <AnimatePresence>
-        {globalError && (
+        {(globalError || submitError) && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -290,7 +292,7 @@ export const WorkExperienceSection = ({
             className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 text-sm font-medium"
           >
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
-            <span>{globalError}</span>
+            <span>{globalError || submitError}</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -304,10 +306,11 @@ export const WorkExperienceSection = ({
       >
         <button
           onClick={handleContinue}
-          className="flex items-center gap-2 px-10 py-5 font-bold rounded-2xl transition-all duration-300 group active:scale-95 bg-gradient-to-r from-lhh-primary-magenta to-lhh-accent-pink text-action-primary-text hover:shadow-[var(--shadow-magenta-glow)] shadow-[var(--shadow-premium)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring cursor-pointer"
+          disabled={isSubmitting}
+          className="flex items-center gap-2 px-10 py-5 font-bold rounded-2xl transition-all duration-300 group active:scale-95 bg-gradient-to-r from-lhh-primary-magenta to-lhh-accent-pink text-action-primary-text hover:shadow-[var(--shadow-magenta-glow)] shadow-[var(--shadow-premium)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
         >
-          {isLast ? 'Enviar' : 'Continuar'}
-          <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+          {isSubmitting ? 'Guardando...' : (isLast ? 'Enviar' : 'Continuar')}
+          <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1 group-disabled:translate-x-0" />
         </button>
 
         {!isFirst && (

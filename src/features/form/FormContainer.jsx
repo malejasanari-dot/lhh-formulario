@@ -14,6 +14,8 @@ const FormContainer = () => {
   const { currentStep, nextStep, prevStep, progress } = useFormStep(totalSteps);
   const [formData, setFormData] = useState({});
   const [direction, setDirection] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   // Hook para gestionar catálogos dinámicos
   const {
@@ -176,6 +178,9 @@ const FormContainer = () => {
   };
 
   const handleNext = async (stepData) => {
+    if (isSubmitting) {
+      return;
+    }
     setDirection(1);
 
     let updatedData = formData;
@@ -196,6 +201,8 @@ const FormContainer = () => {
     console.log(updatedData);
     console.log('===============================');
 
+    setIsSubmitting(true);
+    setSubmitError(null);
     try {
       const candidateFormData = new FormData();
 
@@ -222,6 +229,8 @@ const FormContainer = () => {
       window.location.href = '/candidate';
     } catch (error) {
       console.error('Error al enviar el formulario al backend:', error);
+      setSubmitError('No se pudo guardar el formulario. Intenta nuevamente.');
+      setIsSubmitting(false);
     }
   };
 
@@ -262,6 +271,8 @@ const FormContainer = () => {
               onPrev={handlePrev}
               isFirst={currentStep === 0}
               isLast={currentStep === totalSteps - 1}
+              isSubmitting={isSubmitting}
+              submitError={submitError}
               catalogs={catalogs}
             />
           ) : (
@@ -271,6 +282,8 @@ const FormContainer = () => {
               onPrev={handlePrev}
               isFirst={currentStep === 0}
               isLast={currentStep === totalSteps - 1}
+              isSubmitting={isSubmitting}
+              submitError={submitError}
               isLoading={loading[currentQuestion?.id]}
               isError={errors[currentQuestion?.id]}
               catalogs={catalogs}

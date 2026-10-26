@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Check, AlertCircle, Plus, X, RefreshCw, Upload, Search } from 'lucide-react';
 import { cn } from '../../../utils/cn';
 import { InternationalPhoneField } from '../../../components/ui/InternationalPhoneField';
+import { normalizeLinkedInUrl, isValidLinkedInUrl } from '../../../utils/linkedin';
+
+const LINKEDIN_ERROR = 'La URL de LinkedIn no es válida. Ejemplo: https://www.linkedin.com/in/tu-perfil';
 
 const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, isError, onRetry, catalogs, initialValue }) => {
   // requiresLevel questions store {language, level} pairs; split them back into
@@ -117,13 +120,17 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
     }
   }, [dropdownOpen]);
 
-  const isValidLinkedInUrl = (url) => {
-    if (!url || !String(url).trim()) return true;
-
-    const normalized = String(url).trim();
-    const linkedinUrlPattern = /^(https?:\/\/)?(www\.)?linkedin\.com\/(in|company)\/[A-Za-z0-9-_%]+\/?$/i;
-
-    return linkedinUrlPattern.test(normalized);
+  // Normaliza el valor de LinkedIn en el input; devuelve false si no es válido.
+  const applyLinkedInNormalization = () => {
+    if (!isValidLinkedInUrl(value)) {
+      setError(LINKEDIN_ERROR);
+      return false;
+    }
+    const normalized = normalizeLinkedInUrl(value);
+    if (normalized && normalized !== value) {
+      setValue(normalized);
+    }
+    return true;
   };
 
   const handleNext = async () => {
@@ -138,8 +145,9 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
       }
     }
 
-    if (question.id === 'linkedin' && !isValidLinkedInUrl(value)) {
-      setError('La URL de LinkedIn no es válida. Ejemplo: https://www.linkedin.com/in/tu-perfil');
+    if (question.id === 'linkedin') {
+      if (!applyLinkedInNormalization()) return;
+      onNext(normalizeLinkedInUrl(value) ?? '');
       return;
     }
 
@@ -669,6 +677,18 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
                 setValue(e.target.value);
                 if (error) setError(null);
               }}
+              onBlur={() => {
+                if (question.id === 'linkedin') applyLinkedInNormalization();
+              }}
+              title={question.hint}
+              aria-describedby={question.hint ? `hint-${question.id}` : undefined}
+              {...(question.type === 'url' && {
+                inputMode: 'url',
+                autoCapitalize: 'none',
+                autoCorrect: 'off',
+                spellCheck: false,
+                autoComplete: 'url',
+              })}
               placeholder={question.placeholder || 'Escribe tu respuesta aquí...'}
               className={cn(
                 "w-full bg-transparent border-b-2 py-6 text-2xl md:text-4xl text-text-primary placeholder:text-text-primary/10 focus:outline-none transition-colors duration-500 font-light",
@@ -681,6 +701,15 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isLoading, is
               error ? "bg-red-500 w-full" : "bg-action-primary w-0 group-focus-within:w-full"
             )} />
           </>
+        )}
+
+        {question.hint && !error && (
+          <p
+            id={`hint-${question.id}`}
+            className="absolute -bottom-8 left-0 text-content-secondary text-sm"
+          >
+            {question.hint}
+          </p>
         )}
 
         <AnimatePresence>

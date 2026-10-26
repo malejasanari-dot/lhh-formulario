@@ -124,8 +124,9 @@ export const QUESTIONS = [
     phaseId: 'personal',
     question: 'URL de tu perfil de LinkedIn',
     description: 'Opcional, pero muy recomendado.',
-    type: 'text',
-    placeholder: 'https://linkedin.com/in/tu-perfil',
+    type: 'url',
+    placeholder: 'https://www.linkedin.com/in/tu-perfil',
+    hint: 'Copia la URL desde tu perfil de LinkedIn. Formato: https://www.linkedin.com/in/tu-perfil',
     required: false,
   },
   {

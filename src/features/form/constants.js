@@ -44,6 +44,7 @@ export const QUESTIONS = [
     phaseId: 'personal',
     question: 'Sube una foto de perfil',
     description: 'Una imagen profesional ayuda a destacar tu perfil.',
+    hint: 'La foto debe pesar como máximo 5 MB.',
     type: 'upload',
     required: false,
   },

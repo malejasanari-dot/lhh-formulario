@@ -6,6 +6,7 @@ import { InternationalPhoneField } from '../../../components/ui/InternationalPho
 import { normalizeLinkedInUrl, isValidLinkedInUrl } from '../../../utils/linkedin';
 
 const LINKEDIN_ERROR = 'La URL de LinkedIn no es válida. Ejemplo: https://www.linkedin.com/in/tu-perfil';
+const PHOTO_MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
 const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isSubmitting, submitError, isLoading, isError, onRetry, catalogs, initialValue }) => {
   // requiresLevel questions store {language, level} pairs; split them back into
@@ -51,6 +52,12 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isSubmitting,
   const maxVisible = isCompact ? 9 : 6;
   const isDropdown = question.variant === 'dropdown' || (question.options?.length > 6);
   const shouldShowDropdownSearch = (question.options?.length || 0) > 6;
+  const uploadDescribedBy = question.type === 'upload'
+    ? [
+      question.hint ? `hint-${question.id}` : null,
+      error ? `error-${question.id}` : null,
+    ].filter(Boolean).join(' ') || undefined
+    : undefined;
 
   // Manejar creación y revocación de URL de previsualización para la foto
   useEffect(() => {
@@ -74,17 +81,26 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isSubmitting,
     setIsDragging(false);
   };
 
+  const handlePhotoSelection = (file) => {
+    if (file.size > PHOTO_MAX_SIZE_BYTES) {
+      setError('La foto debe pesar como máximo 5 MB. Selecciona una imagen más pequeña.');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      setError('Por favor selecciona un archivo de imagen válido.');
+      return;
+    }
+
+    setValue(file);
+    setError(null);
+  };
+
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
     if (e.dataTransfer.files?.[0]) {
-      const file = e.dataTransfer.files[0];
-      if (file.type.startsWith('image/')) {
-        setValue(file);
-        setError(null);
-      } else {
-        setError('Por favor selecciona un archivo de imagen válido.');
-      }
+      handlePhotoSelection(e.dataTransfer.files[0]);
     }
   };
 
@@ -555,7 +571,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isSubmitting,
           <div className="space-y-4">
             <div
               className={cn(
-                "w-full h-64 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center space-y-4 transition-all duration-500 cursor-pointer group/upload overflow-hidden relative",
+                "w-full h-64 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center space-y-4 transition-all duration-500 cursor-pointer group/upload overflow-hidden relative focus-within:ring-2 focus-within:ring-focus-ring",
                 isDragging
                   ? "border-action-primary bg-state-active-bg/50 scale-[1.01]"
                   : value
@@ -570,13 +586,15 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isSubmitting,
               <input
                 ref={inputRef}
                 type="file"
-                className="hidden"
+                className="sr-only"
                 accept="image/*"
+                aria-label={question.question}
+                aria-describedby={uploadDescribedBy}
+                aria-invalid={Boolean(error)}
                 onChange={(e) => {
-                  if (e.target.files?.[0]) {
-                    setValue(e.target.files[0]);
-                    setError(null);
-                  }
+                  const file = e.target.files?.[0];
+                  if (file) handlePhotoSelection(file);
+                  e.target.value = '';
                 }}
               />
               {value && previewUrl ? (
@@ -631,6 +649,11 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isSubmitting,
                 </>
               )}
             </div>
+            {question.hint && (
+              <p id={`hint-${question.id}`} className="text-sm text-content-secondary">
+                {question.hint}
+              </p>
+            )}
           </div>
         ) : question.type === 'date' ? (
           <>
@@ -703,7 +726,7 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isSubmitting,
           </>
         )}
 
-        {question.hint && !error && (
+        {question.hint && question.type !== 'upload' && !error && (
           <p
             id={`hint-${question.id}`}
             className="absolute -bottom-8 left-0 text-content-secondary text-sm"
@@ -718,6 +741,8 @@ const QuestionView = ({ question, onNext, onPrev, isFirst, isLast, isSubmitting,
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
+              id={error ? `error-${question.id}` : undefined}
+              role="alert"
               className="absolute -bottom-8 left-0 flex items-center gap-2 text-red-500 text-sm font-medium"
             >
               <AlertCircle className="w-4 h-4" />
